@@ -1,0 +1,11 @@
+{
+  "name": "furo-mobile-root",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "start": "pnpm -C mobile start",
+    "android": "pnpm -C mobile android",
+    "ios": "pnpm -C mobile ios",
+    "web": "pnpm -C mobile web"
+  }
+}

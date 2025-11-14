@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "name": "Furo Mobile",
+    "slug": "furo-mobile",
+    "version": "0.1.0",
+    "platforms": ["ios", "android", "web"],
+    "scheme": "furo-mobile",
+    "extra": {
+      "note": "Use EXPO_PUBLIC_BASE_URL env for runtime API base URL"
+    }
+  }
+}
