@@ -9,7 +9,6 @@ import BalanceScreen from './src/screens/BalanceScreen';
 import TransactionsScreen from './src/screens/TransactionsScreen';
 import ReportScreen from './src/screens/ReportScreen';
 import UploadApiScreen from './src/screens/UploadApiScreen';
-import WalletScreen from './src/screens/WalletScreen';
 import { WalletProvider } from './src/wallet/WalletContext';
 
 const Stack = createNativeStackNavigator();
@@ -23,8 +22,7 @@ export default function App() {
         Balance: 'balance',
         Transactions: 'transactions',
         Report: 'report',
-        Upload: 'upload',
-        Wallet: 'wallet'
+        Upload: 'upload'
       }
     }
   };
@@ -37,7 +35,6 @@ export default function App() {
           <Stack.Screen name="Transactions" component={TransactionsScreen} />
           <Stack.Screen name="Report" component={ReportScreen} />
           <Stack.Screen name="Upload" component={UploadApiScreen} />
-          <Stack.Screen name="Wallet" component={WalletScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </WalletProvider>

@@ -28,6 +28,7 @@ npm run start
 ```env
 EXPO_PUBLIC_BASE_URL=http://10.0.2.2:3000
 EXPO_PUBLIC_WC_PROJECT_ID=YOUR_WALLETCONNECT_PROJECT_ID
+EXPO_PUBLIC_RPC_URL=https://cloudflare-eth.com
 ```
 
 4. Emulator/simulator tips
@@ -45,3 +46,7 @@ EXPO_PUBLIC_WC_PROJECT_ID=YOUR_WALLETCONNECT_PROJECT_ID
 
 7. Replace placeholder endpoints
 - The screens call placeholder provider endpoints like `/api/providers/me/balance` and `/api/providers/me/transactions`. Update these to match your backend routes and auth.
+
+8. Wallet balance in Balance screen
+- The Balance screen now also shows the connected wallet's on-chain ETH balance.
+- Set `EXPO_PUBLIC_RPC_URL` if you want to use a specific RPC provider; otherwise it defaults to Cloudflare's public gateway for Ethereum mainnet.

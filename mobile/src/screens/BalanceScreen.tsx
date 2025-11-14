@@ -1,45 +1,68 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, Button } from 'react-native';
-import { BASE_URL } from '../config';
+import React, { useState } from 'react';
+import { View, Text, ActivityIndicator, StyleSheet, Button, Alert } from 'react-native';
+import { BASE_URL, rpcUrlForChain } from '../config';
+import { useWallet } from '../wallet/WalletContext';
+import { ethers } from 'ethers';
 
 export default function BalanceScreen() {
-  const [loading, setLoading] = useState(true);
-  const [balance, setBalance] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const { connected, address, chainId, connect, initError } = useWallet();
 
-  useEffect(() => {
-    fetchBalance();
-  }, []);
-
-  async function fetchBalance() {
-    setLoading(true);
-    setError(null);
+  async function fetchBackendBalance(): Promise<string> {
     try {
       // Example API: GET /api/providers/me/balance or similar - replace with your endpoint
       const res = await fetch(`${BASE_URL}/api/providers/me/balance`);
       if (!res.ok) throw new Error(`Status ${res.status}`);
       const json = await res.json();
       // Expect json { success: true, data: { balance: '123' }}
-      setBalance(json?.data?.balance?.toString() ?? '0');
+      return json?.data?.balance?.toString() ?? '0';
     } catch (err: any) {
-      setError(err.message || 'Failed to fetch balance');
+      return `Error: ${err.message || 'Failed to fetch backend balance'}`;
+    }
+  }
+
+  async function fetchOnchainBalance(): Promise<string> {
+    if (!connected || !address) return 'Not connected';
+    try {
+      const rpc = rpcUrlForChain(chainId);
+      const provider = new ethers.JsonRpcProvider(rpc);
+      const bal = await provider.getBalance(address);
+      return `${ethers.formatEther(bal)} ETH`;
+    } catch (e: any) {
+      return `Error: ${e?.message || 'Failed to load on-chain balance'}`;
+    }
+  }
+
+  async function onWalletPress() {
+    if (initError) {
+      Alert.alert('Wallet', initError + '\n\nSet EXPO_PUBLIC_WC_PROJECT_ID and restart.');
+      return;
+    }
+    setBusy(true);
+    try {
+      if (!connected) {
+        await connect();
+      }
+      const [backend, onchain] = await Promise.all([
+        fetchBackendBalance(),
+        fetchOnchainBalance()
+      ]);
+      const addrLine = address ? `\nAddress: ${address}` : '';
+      const chainLine = chainId ? `\nChain ID: ${chainId}` : '';
+      Alert.alert('Balances', `Backend: ${backend}\nWallet: ${onchain}${addrLine}${chainLine}`);
+    } catch (e: any) {
+      Alert.alert('Wallet', e?.message || 'Operation failed');
     } finally {
-      setLoading(false);
+      setBusy(false);
     }
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Balance</Text>
-      {loading ? (
-        <ActivityIndicator />
-      ) : error ? (
-        <Text style={styles.error}>{error}</Text>
-      ) : (
-        <Text style={styles.balance}>{balance} (in smallest unit)</Text>
-      )}
+      <Text style={styles.title}>Balances</Text>
+      {busy ? <ActivityIndicator /> : null}
       <View style={{ height: 12 }} />
-      <Button title="Refresh" onPress={fetchBalance} />
+      <Button title={connected ? 'Wallet' : 'Connect Wallet'} onPress={onWalletPress} />
     </View>
   );
 }
