@@ -6,7 +6,8 @@
     "platforms": ["ios", "android", "web"],
     "scheme": "furo-mobile",
     "extra": {
-      "note": "Use EXPO_PUBLIC_BASE_URL env for runtime API base URL"
+      "note": "Use EXPO_PUBLIC_BASE_URL env for runtime API base URL",
+      "EXPO_PUBLIC_WC_PROJECT_ID": "ad8e704b2aacaff2e26c9a06c81dba0d"
     }
   }
 }
