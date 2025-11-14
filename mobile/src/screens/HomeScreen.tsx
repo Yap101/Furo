@@ -12,6 +12,8 @@ export default function HomeScreen({ navigation }: any) {
       <Button title="Report" onPress={() => navigation.navigate('Report')} />
       <View style={{ height: 8 }} />
       <Button title="Upload API" onPress={() => navigation.navigate('Upload')} />
+      <View style={{ height: 8 }} />
+      <Button title="Wallet" onPress={() => navigation.navigate('Wallet')} />
     </View>
   );
 }

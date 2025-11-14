@@ -27,6 +27,7 @@ npm run start
 
 ```env
 EXPO_PUBLIC_BASE_URL=http://10.0.2.2:3000
+EXPO_PUBLIC_WC_PROJECT_ID=YOUR_WALLETCONNECT_PROJECT_ID
 ```
 
 4. Emulator/simulator tips
@@ -38,7 +39,9 @@ EXPO_PUBLIC_BASE_URL=http://10.0.2.2:3000
 - Ensure your backend is running and CORS allows requests from the mobile app.
 
 6. Wallet integration
-- For mobile wallet connections use WalletConnect (recommended). I can add integration once you pick a wallet flow.
+- WalletConnect v2 is integrated using SignClient.
+- Set `EXPO_PUBLIC_WC_PROJECT_ID` (create one at https://cloud.walletconnect.com).
+- Use the Wallet screen to connect; if a pairing URI appears, copy it and open in your wallet if it doesn’t open automatically.
 
 7. Replace placeholder endpoints
 - The screens call placeholder provider endpoints like `/api/providers/me/balance` and `/api/providers/me/transactions`. Update these to match your backend routes and auth.
