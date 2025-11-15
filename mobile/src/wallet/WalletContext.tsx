@@ -16,6 +16,7 @@ type WalletState = {
   connect: (opts?: { chains?: string[] }) => Promise<void>;
   disconnect: () => Promise<void>;
   signMessage: (message: string) => Promise<string>;
+  cancelPending: () => void;
 };
 
 const WalletCtx = createContext<WalletState | null>(null);
@@ -34,6 +35,8 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<SessionTypes.Struct | null>(null);
   const [pairingUri, setPairingUri] = useState<string | null>(null);
   const [initError, setInitError] = useState<string | null>(null);
+  const pendingApprovalRef = useRef<Promise<SessionTypes.Struct> | null>(null);
+  const cancelRejectRef = useRef<(() => void) | null>(null);
 
   const address = useMemo(() => session?.namespaces?.eip155?.accounts?.[0]?.split(':')[2], [session]);
   const chainId = useMemo(() => {
@@ -49,14 +52,15 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         setInitError('Missing WalletConnect project ID (set EXPO_PUBLIC_WC_PROJECT_ID)');
         return;
       }
+      let clientInstance: SignClient | null = null;
       try {
-        const c = await SignClient.init({ projectId, metadata: {
+        clientInstance = await SignClient.init({ projectId, metadata: {
           name: 'Furo Mobile',
           description: 'Furo Mobile WalletConnect',
           url: 'https://example.com',
           icons: ['https://walletconnect.com/walletconnect-logo.png']
         }});
-        setClient(c);
+        setClient(clientInstance);
       } catch (e: any) {
         setInitError(e?.message || 'Failed to initialize wallet client');
         return;
@@ -70,15 +74,17 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         } catch {}
       }
 
-      c.on('session_update', ({ topic, params }) => {
+      if (!clientInstance) return;
+
+      clientInstance.on('session_update', ({ topic, params }: any) => {
         const { namespaces } = params;
-        const current = c.session.get(topic);
+        const current = clientInstance.session.get(topic);
         const next = { ...current, namespaces } as SessionTypes.Struct;
         setSession(next);
         AsyncStorage.setItem(WC_SESSION_KEY, JSON.stringify(next)).catch(() => {});
       });
 
-      c.on('session_delete', () => {
+      clientInstance.on('session_delete', () => {
         setSession(null);
         AsyncStorage.removeItem(WC_SESSION_KEY).catch(() => {});
       });
@@ -105,10 +111,20 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         await Linking.openURL(uri);
       } catch {}
     }
-    const sess = await approval();
-    setSession(sess);
-    setPairingUri(null);
-    await AsyncStorage.setItem(WC_SESSION_KEY, JSON.stringify(sess));
+    const cancelWait = new Promise<never>((_, reject) => {
+      cancelRejectRef.current = () => reject(new Error('Connection cancelled'));
+    });
+    const approvalPromise = approval();
+    pendingApprovalRef.current = approvalPromise;
+    try {
+      const sess = await Promise.race([approvalPromise, cancelWait]);
+      setSession(sess as SessionTypes.Struct);
+      await AsyncStorage.setItem(WC_SESSION_KEY, JSON.stringify(sess));
+    } finally {
+      setPairingUri(null);
+      pendingApprovalRef.current = null;
+      cancelRejectRef.current = null;
+    }
   }, [client]);
 
   const disconnect = useCallback(async () => {
@@ -145,6 +161,14 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     connect,
     disconnect,
     signMessage,
+    cancelPending: () => {
+      setPairingUri(null);
+      if (cancelRejectRef.current) {
+        cancelRejectRef.current();
+        cancelRejectRef.current = null;
+      }
+      pendingApprovalRef.current = null;
+    },
   }), [session, address, chainId, pairingUri, initError, connect, disconnect, signMessage]);
 
   return <WalletCtx.Provider value={value}>{children}</WalletCtx.Provider>;

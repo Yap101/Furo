@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, Button, Alert } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import { BASE_URL, rpcUrlForChain } from '../config';
 import { useWallet } from '../wallet/WalletContext';
 import { ethers } from 'ethers';
 
 export default function BalanceScreen() {
   const [busy, setBusy] = useState(false);
-  const [pairing, setPairing] = useState<string | null>(null);
   const [timeoutHit, setTimeoutHit] = useState(false);
-  const { connected, address, chainId, connect, initError } = useWallet();
+  const { connected, address, chainId, connect, initError, pairingUri, cancelPending } = useWallet();
 
   async function fetchBackendBalance(): Promise<string> {
     try {
@@ -93,11 +93,22 @@ export default function BalanceScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>Balances</Text>
       {busy ? <ActivityIndicator /> : null}
+      {pairingUri ? (
+        <View style={styles.pairingBox}>
+          <Text style={styles.pairingTitle}>WalletConnect Link</Text>
+          <Text selectable style={styles.pairingUri}>{pairingUri}</Text>
+          <View style={styles.row}>
+            <Button title="Copy link" onPress={() => Clipboard.setStringAsync(pairingUri)} />
+            <View style={{ width: 12 }} />
+            <Button title="Cancel" color="#cc3333" onPress={() => { cancelPending(); Alert.alert('Wallet', 'Connection cancelled'); }} />
+          </View>
+        </View>
+      ) : null}
       {timeoutHit && !connected ? (
         <Text style={styles.hint}>Approve the connection in your wallet app. If not opened, copy the pairing link from the earlier screen or reopen the app.</Text>
       ) : null}
       <View style={{ height: 12 }} />
-      <Button title={connected ? 'Wallet' : 'Connect Wallet'} onPress={onWalletPress} />
+      <Button title={connected ? 'Wallet' : 'Connect Wallet'} onPress={onWalletPress} disabled={busy || !!pairingUri} />
     </View>
   );
 }
@@ -106,6 +117,10 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, alignItems: 'center' },
   title: { fontSize: 22, marginTop: 20 },
   balance: { fontSize: 28, marginTop: 12, fontWeight: '600' },
-  error: { color: 'red', marginTop: 12 }
-  ,hint: { fontSize: 12, color: '#666', marginTop: 12, textAlign: 'center', paddingHorizontal: 16 }
+  error: { color: 'red', marginTop: 12 },
+  hint: { fontSize: 12, color: '#666', marginTop: 12, textAlign: 'center', paddingHorizontal: 16 },
+  pairingBox: { marginTop: 16, padding: 12, borderWidth: 1, borderColor: '#ddd', borderRadius: 8, width: '100%' },
+  pairingTitle: { fontSize: 14, fontWeight: '600', marginBottom: 8 },
+  pairingUri: { fontSize: 12, color: '#333' },
+  row: { flexDirection: 'row', marginTop: 10, alignItems: 'center' }
 });
