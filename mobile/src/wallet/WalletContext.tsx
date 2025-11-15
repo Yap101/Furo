@@ -106,25 +106,25 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     });
     if (uri) {
       setPairingUri(uri);
-      // Attempt to open with wallet if possible
-      try {
-        await Linking.openURL(uri);
-      } catch {}
     }
     const cancelWait = new Promise<never>((_, reject) => {
       cancelRejectRef.current = () => reject(new Error('Connection cancelled'));
     });
     const approvalPromise = approval();
     pendingApprovalRef.current = approvalPromise;
-    try {
-      const sess = await Promise.race([approvalPromise, cancelWait]);
-      setSession(sess as SessionTypes.Struct);
-      await AsyncStorage.setItem(WC_SESSION_KEY, JSON.stringify(sess));
-    } finally {
-      setPairingUri(null);
-      pendingApprovalRef.current = null;
-      cancelRejectRef.current = null;
-    }
+    Promise.race([approvalPromise, cancelWait])
+      .then(async (sess) => {
+        if (sess) {
+          setSession(sess as SessionTypes.Struct);
+          await AsyncStorage.setItem(WC_SESSION_KEY, JSON.stringify(sess));
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        setPairingUri(null);
+        pendingApprovalRef.current = null;
+        cancelRejectRef.current = null;
+      });
   }, [client]);
 
   const disconnect = useCallback(async () => {
