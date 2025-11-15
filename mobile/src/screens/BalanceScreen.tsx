@@ -6,6 +6,8 @@ import { ethers } from 'ethers';
 
 export default function BalanceScreen() {
   const [busy, setBusy] = useState(false);
+  const [pairing, setPairing] = useState<string | null>(null);
+  const [timeoutHit, setTimeoutHit] = useState(false);
   const { connected, address, chainId, connect, initError } = useWallet();
 
   async function fetchBackendBalance(): Promise<string> {
@@ -39,9 +41,17 @@ export default function BalanceScreen() {
       return;
     }
     setBusy(true);
+    setTimeoutHit(false);
     try {
       if (!connected) {
-        await connect();
+        // Wrap connect in a timeout so UI does not spin forever when user must approve externally.
+        const connectPromise = (async () => {
+          await connect();
+        })();
+        const { result, timedOut } = await promiseWithTimeout(connectPromise, 15000);
+        if (timedOut) {
+          setTimeoutHit(true);
+        }
       }
       const [backend, onchain] = await Promise.all([
         fetchBackendBalance(),
@@ -57,10 +67,35 @@ export default function BalanceScreen() {
     }
   }
 
+  function promiseWithTimeout<T>(promise: Promise<T>, ms: number): Promise<{ result?: T; timedOut: boolean }> {
+    return new Promise(resolve => {
+      let settled = false;
+      const timer = setTimeout(() => {
+        if (!settled) resolve({ timedOut: true });
+      }, ms);
+      promise.then(r => {
+        if (!settled) {
+          settled = true;
+          clearTimeout(timer);
+          resolve({ result: r, timedOut: false });
+        }
+      }).catch(() => {
+        if (!settled) {
+          settled = true;
+          clearTimeout(timer);
+          resolve({ timedOut: false });
+        }
+      });
+    });
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Balances</Text>
       {busy ? <ActivityIndicator /> : null}
+      {timeoutHit && !connected ? (
+        <Text style={styles.hint}>Approve the connection in your wallet app. If not opened, copy the pairing link from the earlier screen or reopen the app.</Text>
+      ) : null}
       <View style={{ height: 12 }} />
       <Button title={connected ? 'Wallet' : 'Connect Wallet'} onPress={onWalletPress} />
     </View>
@@ -72,4 +107,5 @@ const styles = StyleSheet.create({
   title: { fontSize: 22, marginTop: 20 },
   balance: { fontSize: 28, marginTop: 12, fontWeight: '600' },
   error: { color: 'red', marginTop: 12 }
+  ,hint: { fontSize: 12, color: '#666', marginTop: 12, textAlign: 'center', paddingHorizontal: 16 }
 });
