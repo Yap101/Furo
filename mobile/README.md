@@ -29,6 +29,10 @@ npm run start
 EXPO_PUBLIC_BASE_URL=http://10.0.2.2:3000
 EXPO_PUBLIC_WC_PROJECT_ID=YOUR_WALLETCONNECT_PROJECT_ID
 EXPO_PUBLIC_RPC_URL=https://cloudflare-eth.com
+EXPO_PUBLIC_MAINNET_RPC_URL=https://cloudflare-eth.com
+EXPO_PUBLIC_SEPOLIA_RPC_URL=https://rpc.sepolia.org
+EXPO_PUBLIC_NETWORK=sepolia
+EXPO_PUBLIC_DEFAULT_CHAIN_ID=11155111
 ```
 
 4. Emulator/simulator tips
@@ -43,6 +47,7 @@ EXPO_PUBLIC_RPC_URL=https://cloudflare-eth.com
 - WalletConnect v2 is integrated using SignClient.
 - Set `EXPO_PUBLIC_WC_PROJECT_ID` (create one at https://cloud.walletconnect.com).
 - Use the Wallet screen to connect; if a pairing URI appears, copy it and open in your wallet if it doesn’t open automatically.
+ - Default chain can be changed via `EXPO_PUBLIC_NETWORK=sepolia` or `EXPO_PUBLIC_DEFAULT_CHAIN_ID=11155111`. RPCs can be overridden with `EXPO_PUBLIC_*_RPC_URL`.
 
 7. Replace placeholder endpoints
 - The screens call placeholder provider endpoints like `/api/providers/me/balance` and `/api/providers/me/transactions`. Update these to match your backend routes and auth.

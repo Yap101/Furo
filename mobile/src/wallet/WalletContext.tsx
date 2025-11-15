@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Linking, Platform } from 'react-native';
 import { ethers } from 'ethers';
 import Constants from 'expo-constants';
+import { defaultChains } from '../config';
 
 type WalletState = {
   connected: boolean;
@@ -87,7 +88,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   const connect = useCallback(async (opts?: { chains?: string[] }) => {
     if (initError) throw new Error(initError);
     if (!client) throw new Error('Wallet client not ready');
-    const chains = opts?.chains ?? ['eip155:1'];
+    const chains = opts?.chains ?? defaultChains();
     const { uri, approval } = await client.connect({
       requiredNamespaces: {
         eip155: {
