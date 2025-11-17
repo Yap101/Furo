@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, Button, Alert, Linking, Modal } from 'react-native';
-import * as Clipboard from 'expo-clipboard';
 import { BASE_URL, rpcUrlForChain } from '../config';
 import { useWallet } from '../wallet/WalletContext';
 import { ethers } from 'ethers';
@@ -146,37 +145,15 @@ export default function BalanceScreen() {
               <Button title="WalletConnect" onPress={() => connectVia('walletconnect')} />
             </View>
             <View style={{ height: 16 }} />
-            <Button title="Close" color="#666" onPress={() => setPickerVisible(false)} />
+            <Button title="Cancel" color="#cc3333" onPress={() => { cancelPending(); setPickerVisible(false); }} />
           </View>
         </View>
       </Modal>
-      {pairingUri ? (
-        <View style={styles.pairingBox}>
-          <Text style={styles.pairingTitle}>WalletConnect Link</Text>
-          <Text selectable style={styles.pairingUri}>{pairingUri}</Text>
-          <View style={styles.row}>
-            <Button title="Copy link" onPress={() => Clipboard.setStringAsync(pairingUri)} />
-            <View style={{ width: 12 }} />
-            <Button title="Cancel" color="#cc3333" onPress={() => { cancelPending(); Alert.alert('Wallet', 'Connection cancelled'); }} />
-          </View>
-          <View style={{ height: 10 }} />
-          <Text style={styles.pairingTitle}>Open in a specific wallet</Text>
-          <View style={styles.rowWrap}>
-            <Button title="MetaMask" onPress={() => connectVia('metamask')} />
-            <View style={{ width: 8 }} />
-            <Button title="Rainbow" onPress={() => connectVia('rainbow')} />
-            <View style={{ width: 8 }} />
-            <Button title="Coinbase" onPress={() => connectVia('coinbase')} />
-            <View style={{ width: 8 }} />
-            <Button title="WalletConnect" onPress={() => connectVia('walletconnect')} />
-          </View>
-        </View>
-      ) : null}
       {timeoutHit && !connected ? (
-        <Text style={styles.hint}>Approve the connection in your wallet app. If not opened, copy the pairing link from the earlier screen or reopen the app.</Text>
+        <Text style={styles.hint}>Approve the connection in your wallet app after selecting it.</Text>
       ) : null}
       <View style={{ height: 12 }} />
-      <Button title={connected ? 'Wallet' : 'Connect Wallet'} onPress={onWalletPress} disabled={busy || !!pairingUri} />
+      <Button title={connected ? 'Wallet' : 'Connect Wallet'} onPress={onWalletPress} disabled={busy || pickerVisible} />
     </View>
   );
 }
@@ -187,9 +164,6 @@ const styles = StyleSheet.create({
   balance: { fontSize: 28, marginTop: 12, fontWeight: '600' },
   error: { color: 'red', marginTop: 12 },
   hint: { fontSize: 12, color: '#666', marginTop: 12, textAlign: 'center', paddingHorizontal: 16 },
-  pairingBox: { marginTop: 16, padding: 12, borderWidth: 1, borderColor: '#ddd', borderRadius: 8, width: '100%' },
-  pairingTitle: { fontSize: 14, fontWeight: '600', marginBottom: 8 },
-  pairingUri: { fontSize: 12, color: '#333' },
   row: { flexDirection: 'row', marginTop: 10, alignItems: 'center' },
   rowWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, alignItems: 'center' },
   modalBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
