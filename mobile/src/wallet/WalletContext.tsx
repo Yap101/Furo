@@ -17,6 +17,7 @@ type WalletState = {
   disconnect: () => Promise<void>;
   signMessage: (message: string) => Promise<string>;
   cancelPending: () => void;
+  validated: boolean;
 };
 
 const WalletCtx = createContext<WalletState | null>(null);
@@ -37,6 +38,8 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   const [initError, setInitError] = useState<string | null>(null);
   const pendingApprovalRef = useRef<Promise<SessionTypes.Struct> | null>(null);
   const cancelRejectRef = useRef<(() => void) | null>(null);
+  const [validated, setValidated] = useState(false);
+  const [validating, setValidating] = useState(false);
 
   const address = useMemo(() => session?.namespaces?.eip155?.accounts?.[0]?.split(':')[2], [session]);
   const chainId = useMemo(() => {
@@ -71,6 +74,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         try {
           const sess = JSON.parse(cached) as SessionTypes.Struct;
           setSession(sess);
+          setValidated(false); // will validate via ping before marking connected
         } catch {}
       }
 
@@ -87,9 +91,33 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       clientInstance.on('session_delete', () => {
         setSession(null);
         AsyncStorage.removeItem(WC_SESSION_KEY).catch(() => {});
+        setValidated(false);
       });
     })();
   }, [projectId]);
+
+  // Validate restored session by pinging peer; if fails, clear session
+  useEffect(() => {
+    (async () => {
+      if (!client || !session || validated || validating) return;
+      setValidating(true);
+      try {
+        // Some versions expose ping; guard at runtime
+        // @ts-ignore
+        if (typeof client.ping === 'function') {
+          // @ts-ignore
+            await client.ping({ topic: session.topic });
+        }
+        setValidated(true);
+      } catch {
+        setSession(null);
+        AsyncStorage.removeItem(WC_SESSION_KEY).catch(() => {});
+        setValidated(false);
+      } finally {
+        setValidating(false);
+      }
+    })();
+  }, [client, session, validated, validating]);
 
   const connect = useCallback(async (opts?: { chains?: string[] }) => {
     if (initError) throw new Error(initError);
@@ -153,7 +181,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   }, [client, session]);
 
   const value = useMemo<WalletState>(() => ({
-    connected: !!session,
+    connected: !!session && validated,
     address,
     chainId,
     pairingUri,
@@ -169,7 +197,8 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       }
       pendingApprovalRef.current = null;
     },
-  }), [session, address, chainId, pairingUri, initError, connect, disconnect, signMessage]);
+    validated,
+  }), [session, address, chainId, pairingUri, initError, connect, disconnect, signMessage, validated]);
 
   return <WalletCtx.Provider value={value}>{children}</WalletCtx.Provider>;
 }

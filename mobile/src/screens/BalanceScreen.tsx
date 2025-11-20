@@ -23,6 +23,19 @@ export default function BalanceScreen() {
     }
   }
 
+  async function fetchUsername(): Promise<string> {
+    try {
+      // Example profile endpoint; adjust if your backend differs
+      const res = await fetch(`${BASE_URL}/api/providers/me`);
+      if (!res.ok) throw new Error(`Status ${res.status}`);
+      const json = await res.json();
+      // Expect json { success: true, data: { username: 'alice' }} or similar
+      return json?.data?.username || json?.data?.name || 'Unknown';
+    } catch (err: any) {
+      return 'Unknown';
+    }
+  }
+
   async function fetchOnchainBalance(): Promise<string> {
     if (!connected || !address) return 'Not connected';
     try {
@@ -43,13 +56,14 @@ export default function BalanceScreen() {
     if (connected) {
       setBusy(true);
       try {
-        const [backend, onchain] = await Promise.all([
+        const [username, backend, onchain] = await Promise.all([
+          fetchUsername(),
           fetchBackendBalance(),
           fetchOnchainBalance()
         ]);
         const addrLine = address ? `\nAddress: ${address}` : '';
         const chainLine = chainId ? `\nChain ID: ${chainId}` : '';
-        Alert.alert('Balances', `Backend: ${backend}\nWallet: ${onchain}${addrLine}${chainLine}`);
+        Alert.alert('Account', `User: ${username}\nBackend Balance: ${backend}\nOn-chain: ${onchain}${addrLine}${chainLine}`);
       } catch (e: any) {
         Alert.alert('Wallet', e?.message || 'Operation failed');
       } finally {
@@ -153,7 +167,7 @@ export default function BalanceScreen() {
         <Text style={styles.hint}>Approve the connection in your wallet app after selecting it.</Text>
       ) : null}
       <View style={{ height: 12 }} />
-      <Button title={connected ? 'Wallet' : 'Connect Wallet'} onPress={onWalletPress} disabled={busy || pickerVisible} />
+      <Button title={connected ? 'Show Account' : 'Connect Wallet'} onPress={onWalletPress} disabled={busy || pickerVisible} />
     </View>
   );
 }
