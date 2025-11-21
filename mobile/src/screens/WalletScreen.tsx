@@ -4,7 +4,7 @@ import * as Clipboard from 'expo-clipboard';
 import { useWallet } from '../wallet/WalletContext';
 
 export default function WalletScreen() {
-  const { connected, address, chainId, pairingUri, initError, connect, disconnect, signMessage } = useWallet();
+  const { connected, address, chainId, pairingUri, initError, connect, disconnect, signMessage, sendTransaction, signTypedData } = useWallet();
   const [loading, setLoading] = useState(false);
 
   async function onConnect() {
@@ -34,6 +34,47 @@ export default function WalletScreen() {
     }
   }
 
+  async function onSendTx() {
+    try {
+      const tx = {
+        from: address,
+        to: address, // send to self
+        data: '0x',
+        value: '0x0', // 0 ETH
+      };
+      const hash = await sendTransaction(tx);
+      Alert.alert('Tx Sent', hash);
+    } catch (e: any) {
+      Alert.alert('Tx failed', e?.message || 'Unknown error');
+    }
+  }
+
+  async function onSignTyped() {
+    try {
+      // EIP-712 Example
+      const domain = {
+        name: 'Furo Mobile',
+        version: '1',
+        chainId: chainId || 1,
+        verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC'
+      };
+      const types = {
+        Person: [
+          { name: 'name', type: 'string' },
+          { name: 'wallet', type: 'address' }
+        ]
+      };
+      const value = {
+        name: 'Furo User',
+        wallet: address
+      };
+      const sig = await signTypedData(domain, types, value);
+      Alert.alert('Typed Signed', sig);
+    } catch (e: any) {
+      Alert.alert('Typed Sign failed', e?.message || 'Unknown error');
+    }
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Wallet</Text>
@@ -49,6 +90,10 @@ export default function WalletScreen() {
           <Text>Chain ID: {chainId}</Text>
           <View style={{ height: 12 }} />
           <Button title="Sign message" onPress={onSign} />
+          <View style={{ height: 12 }} />
+          <Button title="Sign Typed Data" onPress={onSignTyped} />
+          <View style={{ height: 12 }} />
+          <Button title="Send Transaction (0 ETH)" onPress={onSendTx} />
           <View style={{ height: 12 }} />
           <Button title="Disconnect" onPress={disconnect} />
         </>

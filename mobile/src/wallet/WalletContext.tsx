@@ -16,6 +16,8 @@ type WalletState = {
   connect: (opts?: { chains?: string[] }) => Promise<void>;
   disconnect: () => Promise<void>;
   signMessage: (message: string) => Promise<string>;
+  sendTransaction: (tx: any) => Promise<string>;
+  signTypedData: (domain: any, types: any, value: any) => Promise<string>;
   cancelPending: () => void;
   validated: boolean;
   validating: boolean;
@@ -31,11 +33,10 @@ const WC_SESSION_KEY = 'wc_session_v2';
 export function WalletProvider({ children }: { children: React.ReactNode }) {
   const projectId =
     process.env.EXPO_PUBLIC_WC_PROJECT_ID ||
-    // Expo SDK 54: read from app.json -> expo.extra
     ((Constants?.expoConfig as any)?.extra?.EXPO_PUBLIC_WC_PROJECT_ID as string | undefined) ||
-    // Fallback for older manifest shapes if any
     ((Constants as any)?.manifest2?.extra?.EXPO_PUBLIC_WC_PROJECT_ID as string | undefined) ||
     '';
+
   const [client, setClient] = useState<SignClient | null>(null);
   const [session, setSession] = useState<SessionTypes.Struct | null>(null);
   const [pairingUri, setPairingUri] = useState<string | null>(null);
@@ -55,6 +56,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     return Number.isFinite(cid) ? cid : undefined;
   }, [session]);
 
+  // Initialize Client
   useEffect(() => {
     (async () => {
       if (!projectId) {
@@ -63,12 +65,14 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       }
       let clientInstance: SignClient | null = null;
       try {
-        clientInstance = await SignClient.init({ projectId, metadata: {
-          name: 'Furo Mobile',
-          description: 'Furo Mobile WalletConnect',
-          url: 'https://example.com',
-          icons: ['https://walletconnect.com/walletconnect-logo.png']
-        }});
+        clientInstance = await SignClient.init({
+          projectId, metadata: {
+            name: 'Furo Mobile',
+            description: 'Furo Mobile WalletConnect',
+            url: 'https://example.com',
+            icons: ['https://walletconnect.com/walletconnect-logo.png']
+          }
+        });
         setClient(clientInstance);
       } catch (e: any) {
         setInitError(e?.message || 'Failed to initialize wallet client');
@@ -80,45 +84,48 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         try {
           const sess = JSON.parse(cached) as SessionTypes.Struct;
           setSession(sess);
-          setValidated(false); // will validate via ping before marking connected
-        } catch {}
+          setValidated(false);
+        } catch { }
       }
 
       if (!clientInstance) return;
 
       clientInstance.on('session_update', ({ topic, params }: any) => {
         const { namespaces } = params;
-        const current = clientInstance.session.get(topic);
+        const current = clientInstance!.session.get(topic);
         const next = { ...current, namespaces } as SessionTypes.Struct;
         setSession(next);
-        AsyncStorage.setItem(WC_SESSION_KEY, JSON.stringify(next)).catch(() => {});
+        AsyncStorage.setItem(WC_SESSION_KEY, JSON.stringify(next)).catch(() => { });
+      });
+
+      clientInstance.on('session_ping', ({ topic }: any) => {
+        console.log(`[WC] Session ping received for topic ${topic}`);
       });
 
       clientInstance.on('session_delete', () => {
         setSession(null);
-        AsyncStorage.removeItem(WC_SESSION_KEY).catch(() => {});
+        AsyncStorage.removeItem(WC_SESSION_KEY).catch(() => { });
         setValidated(false);
       });
     })();
   }, [projectId]);
 
-  // Validate restored session by pinging peer; if fails, clear session
+  // Validate Session
   useEffect(() => {
     (async () => {
       if (!client || !session || validated || validating) return;
-      if (validationAttemptsRef.current > 2) return; // avoid infinite loop
+      if (validationAttemptsRef.current > 2) return;
       setValidating(true);
       try {
-        // Some versions expose ping; guard at runtime
         // @ts-ignore
         if (typeof client.ping === 'function') {
           // @ts-ignore
-            await client.ping({ topic: session.topic });
+          await client.ping({ topic: session.topic });
         }
         setValidated(true);
       } catch {
         setSession(null);
-        AsyncStorage.removeItem(WC_SESSION_KEY).catch(() => {});
+        AsyncStorage.removeItem(WC_SESSION_KEY).catch(() => { });
         setValidated(false);
         validationAttemptsRef.current += 1;
       } finally {
@@ -137,7 +144,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       const res = await client.connect({
         requiredNamespaces: {
           eip155: {
-            methods: ['eth_sendTransaction', 'eth_sign', 'personal_sign', 'eth_signTypedData'],
+            methods: ['eth_sendTransaction', 'personal_sign', 'eth_signTypedData'],
             chains,
             events: ['chainChanged', 'accountsChanged']
           }
@@ -149,7 +156,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       const msg = e?.message || String(e);
       setLastError(msg);
       if (/No matching key/i.test(msg)) {
-        await AsyncStorage.removeItem(WC_SESSION_KEY).catch(() => {});
+        await AsyncStorage.removeItem(WC_SESSION_KEY).catch(() => { });
         setSession(null);
         setValidated(false);
       }
@@ -173,7 +180,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       .catch((e: any) => {
         const msg = e?.message || String(e);
         if (/No matching key/i.test(msg)) {
-          AsyncStorage.removeItem(WC_SESSION_KEY).catch(() => {});
+          AsyncStorage.removeItem(WC_SESSION_KEY).catch(() => { });
           setSession(null);
           setValidated(false);
           setLastError('Stale or invalid session; please reconnect');
@@ -201,13 +208,50 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     if (!client || !session) throw new Error('Not connected');
     const account = session.namespaces.eip155.accounts[0];
     const [, , addr] = account.split(':');
-    const msgHex = ethers.encodeBytes32String(message);
+    const msgHex = ethers.hexlify(ethers.toUtf8Bytes(message));
     const result = await client.request({
       topic: session.topic,
       chainId: session.namespaces.eip155.chains?.[0] || 'eip155:1',
       request: {
         method: 'personal_sign',
         params: [msgHex, addr]
+      }
+    });
+    return String(result);
+  }, [client, session]);
+
+  const sendTransaction = useCallback(async (tx: any) => {
+    if (!client || !session) throw new Error('Not connected');
+    const account = session.namespaces.eip155.accounts[0];
+    const [, , addr] = account.split(':');
+    const result = await client.request({
+      topic: session.topic,
+      chainId: session.namespaces.eip155.chains?.[0] || 'eip155:1',
+      request: {
+        method: 'eth_sendTransaction',
+        params: [{ ...tx, from: addr }]
+      }
+    });
+    return String(result);
+  }, [client, session]);
+
+  const signTypedData = useCallback(async (domain: any, types: any, value: any) => {
+    if (!client || !session) throw new Error('Not connected');
+    const account = session.namespaces.eip155.accounts[0];
+    const [, , addr] = account.split(':');
+    const payload = JSON.stringify({
+      types,
+      domain,
+      primaryType: Object.keys(types)[0],
+      message: value
+    });
+
+    const result = await client.request({
+      topic: session.topic,
+      chainId: session.namespaces.eip155.chains?.[0] || 'eip155:1',
+      request: {
+        method: 'eth_signTypedData',
+        params: [addr, payload]
       }
     });
     return String(result);
@@ -222,6 +266,8 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     connect,
     disconnect,
     signMessage,
+    sendTransaction,
+    signTypedData,
     cancelPending: () => {
       setPairingUri(null);
       if (cancelRejectRef.current) {
@@ -238,13 +284,12 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       setPairingUri(null);
       setSession(null);
       setValidated(false);
-      // Also purge any walletconnect related keys
       try {
         const keys = await AsyncStorage.getAllKeys();
         const targets = keys.filter(k => k.startsWith('walletconnect') || k.includes('wc@') || k.includes('wc_session'));
         if (targets.length) await AsyncStorage.multiRemove(targets);
-      } catch {}
-      await AsyncStorage.removeItem(WC_SESSION_KEY).catch(() => {});
+      } catch { }
+      await AsyncStorage.removeItem(WC_SESSION_KEY).catch(() => { });
       setLastError(null);
       console.log('[WC] Force reset executed');
     },
@@ -254,9 +299,9 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         const keys = await AsyncStorage.getAllKeys();
         const targets = keys.filter(k => k.startsWith('walletconnect') || k.includes('wc@') || k.includes('wc_session'));
         if (targets.length) await AsyncStorage.multiRemove(targets);
-      } catch {}
+      } catch { }
     },
-  }), [session, address, chainId, pairingUri, initError, connect, disconnect, signMessage, validated, validating, lastError]);
+  }), [session, address, chainId, pairingUri, initError, connect, disconnect, signMessage, sendTransaction, signTypedData, validated, validating, lastError]);
 
   return <WalletCtx.Provider value={value}>{children}</WalletCtx.Provider>;
 }

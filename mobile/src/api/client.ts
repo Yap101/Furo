@@ -31,7 +31,7 @@ function sleep(ms: number) { return new Promise(r => setTimeout(r, ms)); }
 export async function apiGet<T = any>(endpoint: string, opts: FetchOptions = {}): Promise<ApiResponse<T>> {
   const base = pickBaseUrl().replace(/\/$/, '');
   const url = /^(http|https):/i.test(endpoint) ? endpoint : `${base}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
-  const { timeoutMs = 8000, retries = 1, retryDelayMs = 500, headers = {} } = opts;
+  const { timeoutMs = 15000, retries = 1, retryDelayMs = 500, headers = {} } = opts;
 
   for (let attempt = 0; attempt <= retries; attempt++) {
     const controller = new AbortController();
@@ -54,7 +54,7 @@ export async function apiGet<T = any>(endpoint: string, opts: FetchOptions = {})
     } catch (e: any) {
       clearTimeout(timer);
       const aborted = e?.name === 'AbortError';
-      const errorMsg = aborted ? 'Timeout exceeded' : e?.message || 'Network request failed';
+      const errorMsg = aborted ? `Timeout exceeded (${timeoutMs}ms) for ${url}` : e?.message || 'Network request failed';
       if (attempt < retries) {
         await sleep(retryDelayMs * (attempt + 1));
         continue;
@@ -65,7 +65,42 @@ export async function apiGet<T = any>(endpoint: string, opts: FetchOptions = {})
   return { ok: false, status: 0, error: 'Unknown failure after retries' };
 }
 
-export async function fetchProfile(): Promise<{ username?: string; name?: string; [k: string]: any } | undefined> {
+export async function apiPost<T = any>(endpoint: string, body: any, opts: FetchOptions = {}): Promise<ApiResponse<T>> {
+  const base = pickBaseUrl().replace(/\/$/, '');
+  const url = /^(http|https):/i.test(endpoint) ? endpoint : `${base}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+  const { timeoutMs = 15000, headers = {} } = opts;
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        ...headers
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal
+    });
+    clearTimeout(timer);
+    let resBody: any = null;
+    const text = await res.text();
+    try { resBody = text ? JSON.parse(text) : null; } catch { resBody = text; }
+
+    if (!res.ok) {
+      return { ok: false, status: res.status, raw: resBody, error: resBody?.error || resBody?.message || `Request failed (${res.status})` };
+    }
+    return { ok: true, status: res.status, raw: resBody, data: resBody?.data ?? resBody };
+  } catch (e: any) {
+    clearTimeout(timer);
+    const aborted = e?.name === 'AbortError';
+    return { ok: false, status: 0, error: aborted ? 'Timeout exceeded' : e?.message || 'Network request failed' };
+  }
+}
+
+export async function fetchProfile(): Promise<{ username?: string; name?: string;[k: string]: any } | undefined> {
   const res = await apiGet('/api/providers/me', { retries: 2 });
   if (!res.ok) return undefined;
   const d: any = res.data;
