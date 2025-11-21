@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, Button, Alert, Linking, Modal } from 'react-native';
 import { BASE_URL, rpcUrlForChain } from '../config';
+import { fetchProfile, fetchBackendBalance as getBackendBal } from '../api/client';
 import { useWallet } from '../wallet/WalletContext';
 import { ethers } from 'ethers';
 
@@ -9,29 +10,35 @@ export default function BalanceScreen() {
   const [timeoutHit, setTimeoutHit] = useState(false);
   const [pickerVisible, setPickerVisible] = useState(false);
   const { connected, address, chainId, connect, initError, pairingUri, cancelPending } = useWallet();
+  const [username, setUsername] = useState<string | null>(null);
+  const [backendBalance, setBackendBalance] = useState<string | null>(null);
+  const [onchainBalance, setOnchainBalance] = useState<string | null>(null);
+  const [accountError, setAccountError] = useState<string | null>(null);
+  // Diagnostics
+  const [profileRaw, setProfileRaw] = useState<any>(null);
+  const [balanceRaw, setBalanceRaw] = useState<any>(null);
+  const [fetchStatus, setFetchStatus] = useState<string | null>(null);
+  const fetchedRef = useRef(false);
 
   async function fetchBackendBalance(): Promise<string> {
     try {
-      // Example API: GET /api/providers/me/balance or similar - replace with your endpoint
-      const res = await fetch(`${BASE_URL}/api/providers/me/balance`);
-      if (!res.ok) throw new Error(`Status ${res.status}`);
-      const json = await res.json();
-      // Expect json { success: true, data: { balance: '123' }}
-      return json?.data?.balance?.toString() ?? '0';
+      const value = await getBackendBal();
+      setBalanceRaw(value);
+      return value;
     } catch (err: any) {
+      setBalanceRaw({ error: err?.message });
       return `Error: ${err.message || 'Failed to fetch backend balance'}`;
     }
   }
 
   async function fetchUsername(): Promise<string> {
     try {
-      // Example profile endpoint; adjust if your backend differs
-      const res = await fetch(`${BASE_URL}/api/providers/me`);
-      if (!res.ok) throw new Error(`Status ${res.status}`);
-      const json = await res.json();
-      // Expect json { success: true, data: { username: 'alice' }} or similar
-      return json?.data?.username || json?.data?.name || 'Unknown';
+      const profile = await fetchProfile();
+      setProfileRaw(profile);
+      const val = profile?.username || profile?.name;
+      return val || 'Unknown';
     } catch (err: any) {
+      setProfileRaw({ error: err?.message });
       return 'Unknown';
     }
   }
@@ -54,21 +61,9 @@ export default function BalanceScreen() {
       return;
     }
     if (connected) {
-      setBusy(true);
-      try {
-        const [username, backend, onchain] = await Promise.all([
-          fetchUsername(),
-          fetchBackendBalance(),
-          fetchOnchainBalance()
-        ]);
-        const addrLine = address ? `\nAddress: ${address}` : '';
-        const chainLine = chainId ? `\nChain ID: ${chainId}` : '';
-        Alert.alert('Account', `User: ${username}\nBackend Balance: ${backend}\nOn-chain: ${onchain}${addrLine}${chainLine}`);
-      } catch (e: any) {
-        Alert.alert('Wallet', e?.message || 'Operation failed');
-      } finally {
-        setBusy(false);
-      }
+      // Manual refresh
+      fetchedRef.current = false; // allow refetch
+      await loadAccountData();
       return;
     }
     // Not connected: show 4 wallet choices, do not default-open
@@ -89,6 +84,7 @@ export default function BalanceScreen() {
       const link = walletLinkFor(target, uri);
       await Linking.openURL(link);
       setPickerVisible(false);
+      // After user approves in wallet, we'll rely on effect below to auto-load balances.
     } catch (e: any) {
       Alert.alert('Wallet', e?.message || 'Unable to start connection');
     }
@@ -139,6 +135,32 @@ export default function BalanceScreen() {
     });
   }
 
+  async function loadAccountData() {
+    if (!connected || !address) return;
+    // Allow manual retry even if previously fetched when values look wrong
+    setBusy(true);
+    setAccountError(null);
+    setFetchStatus(null);
+    try {
+      const [u, b, o] = await Promise.all([
+        fetchUsername(),
+        fetchBackendBalance(),
+        fetchOnchainBalance()
+      ]);
+      setUsername(u);
+      setBackendBalance(b);
+      setOnchainBalance(o);
+      fetchedRef.current = true;
+    } catch (e: any) {
+      setAccountError(e?.message || 'Failed to load account');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  // Auto-fetch once connected & validated (button press not required)
+  useEffect(() => { if (connected) loadAccountData(); }, [connected]);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Balances</Text>
@@ -167,7 +189,28 @@ export default function BalanceScreen() {
         <Text style={styles.hint}>Approve the connection in your wallet app after selecting it.</Text>
       ) : null}
       <View style={{ height: 12 }} />
-      <Button title={connected ? 'Show Account' : 'Connect Wallet'} onPress={onWalletPress} disabled={busy || pickerVisible} />
+      <Button title={connected ? 'Refresh Account' : 'Connect Wallet'} onPress={onWalletPress} disabled={busy || pickerVisible} />
+      {connected ? (
+        <View style={{ marginTop: 16, width: '100%' }}>
+          <Text style={styles.sectionTitle}>Account Info</Text>
+          {!fetchedRef.current && busy ? <ActivityIndicator /> : null}
+          {accountError ? <Text style={styles.error}>{accountError}</Text> : (
+            <>
+              <Text style={styles.label}>Username: <Text style={styles.value}>{username ?? '...'}</Text></Text>
+              <Text style={styles.label}>Backend Balance: <Text style={styles.value}>{backendBalance ?? '...'}</Text></Text>
+              <Text style={styles.label}>On-chain Balance: <Text style={styles.value}>{onchainBalance ?? '...'}</Text></Text>
+              <Text style={styles.label}>Address: <Text style={styles.value}>{address}</Text></Text>
+              <Text style={styles.label}>Chain ID: <Text style={styles.value}>{chainId}</Text></Text>
+              <View style={{ height: 12 }} />
+              <Text style={styles.sectionTitle}>Diagnostics</Text>
+              <Text style={styles.diag}>BASE_URL: {BASE_URL}</Text>
+              <Text style={styles.diag}>Fetch Status: {fetchStatus ?? 'n/a'}</Text>
+              <Text style={styles.diag}>Profile Raw: {JSON.stringify(profileRaw)}</Text>
+              <Text style={styles.diag}>Balance Raw: {JSON.stringify(balanceRaw)}</Text>
+            </>
+          )}
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -183,4 +226,8 @@ const styles = StyleSheet.create({
   modalBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
   modalCard: { backgroundColor: '#fff', padding: 16, borderTopLeftRadius: 12, borderTopRightRadius: 12 },
   modalTitle: { fontSize: 18, fontWeight: '600' }
+  ,sectionTitle: { fontSize: 16, fontWeight: '600', marginBottom: 8 }
+  ,label: { fontSize: 14, marginTop: 4 }
+  ,value: { fontWeight: '600' }
+  ,diag: { fontSize: 10, color: '#444', marginTop: 2 }
 });

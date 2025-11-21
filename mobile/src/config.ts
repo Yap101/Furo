@@ -40,10 +40,10 @@ export function rpcUrlForChain(chainId?: number): string {
 }
 
 export function defaultChainId(): number {
-  const parsed = Number(ENV_DEFAULT_CHAIN_ID);
-  if (Number.isFinite(parsed) && parsed > 0) return parsed;
-  if (ENV_NETWORK === 'sepolia') return 11155111;
-  return 1;
+  // Forced to Sepolia per user request (chain id 11155111).
+  // If you later want to make this dynamic again, restore the previous
+  // environment-based logic or set EXPO_PUBLIC_DEFAULT_CHAIN_ID.
+  return 11155111;
 }
 
 export function defaultChains(): string[] {
