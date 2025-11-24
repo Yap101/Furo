@@ -1,10 +1,10 @@
-import { PrismaClient } from '@/lib/generated/prisma/client';
+import { PrismaClient } from '../lib/generated/prisma/client';
 import { config } from 'dotenv';
 
-// Load environment variables from .env.local
-config({ path: '.env.local' });
+// Load environment variables
+config();
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({});
 
 async function main() {
   console.log('🌱 Seeding database...');

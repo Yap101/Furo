@@ -5,45 +5,44 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model Api {
-  id                  String     @id
+  id                  String  @id
   providerId          String
   name                String
   description         String
   category            String
   endpoint            String
-  publicPath          String     @unique
-  method              String     @default("GET")
+  publicPath          String  @unique
+  method              String  @default("GET")
   pricePerCall        String
-  currency            String     @default("ETH")
-  isActive            Boolean    @default(true)
-  totalCalls          Int        @default(0)
-  totalRevenue        String     @default("0")
-  averageResponseTime Int        @default(0)
-  uptime              Float      @default(100.0)
+  currency            String  @default("ETH")
+  isActive            Boolean @default(true)
+  totalCalls          Int     @default(0)
+  totalRevenue        String  @default("0")
+  averageResponseTime Int     @default(0)
+  uptime              Float   @default(100.0)
   documentation       Json?
   headers             Json?
   queryParams         Json?
 
   // Double Relay Fields
-  internalEndpoint    String?    // Our internal relay endpoint path
-  internalAuth        Json?      // Authentication for internal-to-provider communication
-  relayConfiguration  Json?      // Double relay settings and configuration
-  isDirectRelay       Boolean    @default(false)  // Toggle: false = double relay, true = direct relay
-  fallbackEndpoint    String?    // Fallback endpoint for internal relay failures
+  internalEndpoint   String? // Our internal relay endpoint path
+  internalAuth       Json? // Authentication for internal-to-provider communication
+  relayConfiguration Json? // Double relay settings and configuration
+  isDirectRelay      Boolean @default(false) // Toggle: false = double relay, true = direct relay
+  fallbackEndpoint   String? // Fallback endpoint for internal relay failures
 
-  createdAt           DateTime   @default(now())
-  updatedAt           DateTime
-  Provider            Provider   @relation(fields: [providerId], references: [id], onDelete: Cascade)
-  Favorite            Favorite[]
-  Payment             Payment[]
-  Review              Review[]
-  Token               Token[]
-  UsageLog            UsageLog[]
-  PurchasedApi        PurchasedApi[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime
+  Provider     Provider       @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  Favorite     Favorite[]
+  Payment      Payment[]
+  Review       Review[]
+  Token        Token[]
+  UsageLog     UsageLog[]
+  PurchasedApi PurchasedApi[]
 
   @@index([category])
   @@index([isActive])
@@ -68,7 +67,7 @@ model ApiKey {
   updatedAt   DateTime  @updatedAt
 
   // Relationship to Provider
-  Provider    Provider  @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  Provider Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
 
   @@index([isActive])
   @@index([keyHash])
@@ -76,13 +75,12 @@ model ApiKey {
   @@index([expiresAt])
 }
 
-
 model Favorite {
-  id         String   @id
-  userId     String   // Developer wallet address who favorited the API
-  apiId      String   // ID of the favorited API
-  createdAt  DateTime @default(now())
-  Api        Api      @relation(fields: [apiId], references: [id], onDelete: Cascade)
+  id        String   @id
+  userId    String // Developer wallet address who favorited the API
+  apiId     String // ID of the favorited API
+  createdAt DateTime @default(now())
+  Api       Api      @relation(fields: [apiId], references: [id], onDelete: Cascade)
 
   @@unique([userId, apiId])
   @@index([apiId])
@@ -117,18 +115,18 @@ model Payment {
 }
 
 model Provider {
-  id              String     @id
-  walletAddress   String     @unique
-  email           String?    @unique
+  id              String         @id
+  walletAddress   String         @unique
+  email           String?        @unique
   name            String?
   description     String?
   website         String?
   avatarUrl       String?
-  isActive        Boolean    @default(true)
-  reputationScore Float      @default(0)
-  totalEarnings   String     @default("0")
-  totalCalls      Int        @default(0)
-  createdAt       DateTime   @default(now())
+  isActive        Boolean        @default(true)
+  reputationScore Float          @default(0)
+  totalEarnings   String         @default("0")
+  totalCalls      Int            @default(0)
+  createdAt       DateTime       @default(now())
   updatedAt       DateTime
   Api             Api[]
   ApiKey          ApiKey[]
@@ -187,18 +185,18 @@ model Token {
 }
 
 model PurchasedApi {
-  id                 String   @id
-  apiId              String
-  developerAddress   String
-  providerId         String
-  transactionHash    String
-  paymentAmount      String
-  status             String   @default("ACTIVE") // ACTIVE, EXPIRED, REVOKED
-  expiresAt          DateTime
-  createdAt          DateTime @default(now())
+  id               String   @id
+  apiId            String
+  developerAddress String
+  providerId       String
+  transactionHash  String
+  paymentAmount    String
+  status           String   @default("ACTIVE") // ACTIVE, EXPIRED, REVOKED
+  expiresAt        DateTime
+  createdAt        DateTime @default(now())
 
-  Api                Api      @relation(fields: [apiId], references: [id], onDelete: Cascade)
-  Provider           Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  Api      Api      @relation(fields: [apiId], references: [id], onDelete: Cascade)
+  Provider Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
 
   @@index([developerAddress])
   @@index([apiId])
