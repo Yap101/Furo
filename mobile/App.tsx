@@ -6,9 +6,9 @@ import * as Linking from 'expo-linking';
 
 import HomeScreen from './src/screens/HomeScreen';
 import BalanceScreen from './src/screens/BalanceScreen';
-import TransactionsScreen from './src/screens/TransactionsScreen';
 import ReportScreen from './src/screens/ReportScreen';
 import UploadApiScreen from './src/screens/UploadApiScreen';
+import TransactionsScreen from './src/screens/TransactionsScreen';
 import { WalletProvider } from './src/wallet/WalletContext';
 
 const Stack = createNativeStackNavigator();

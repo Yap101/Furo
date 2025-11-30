@@ -33,11 +33,6 @@ export type ApiKey = Prisma.ApiKeyModel
  */
 export type Favorite = Prisma.FavoriteModel
 /**
- * Model Payment
- * 
- */
-export type Payment = Prisma.PaymentModel
-/**
  * Model Provider
  * 
  */

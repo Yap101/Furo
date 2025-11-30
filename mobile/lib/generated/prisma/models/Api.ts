@@ -366,7 +366,6 @@ export type ApiWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Api"> | Date | string
   Provider?: Prisma.XOR<Prisma.ProviderScalarRelationFilter, Prisma.ProviderWhereInput>
   Favorite?: Prisma.FavoriteListRelationFilter
-  Payment?: Prisma.PaymentListRelationFilter
   Review?: Prisma.ReviewListRelationFilter
   Token?: Prisma.TokenListRelationFilter
   UsageLog?: Prisma.UsageLogListRelationFilter
@@ -401,7 +400,6 @@ export type ApiOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   Provider?: Prisma.ProviderOrderByWithRelationInput
   Favorite?: Prisma.FavoriteOrderByRelationAggregateInput
-  Payment?: Prisma.PaymentOrderByRelationAggregateInput
   Review?: Prisma.ReviewOrderByRelationAggregateInput
   Token?: Prisma.TokenOrderByRelationAggregateInput
   UsageLog?: Prisma.UsageLogOrderByRelationAggregateInput
@@ -439,7 +437,6 @@ export type ApiWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Api"> | Date | string
   Provider?: Prisma.XOR<Prisma.ProviderScalarRelationFilter, Prisma.ProviderWhereInput>
   Favorite?: Prisma.FavoriteListRelationFilter
-  Payment?: Prisma.PaymentListRelationFilter
   Review?: Prisma.ReviewListRelationFilter
   Token?: Prisma.TokenListRelationFilter
   UsageLog?: Prisma.UsageLogListRelationFilter
@@ -537,7 +534,6 @@ export type ApiCreateInput = {
   updatedAt: Date | string
   Provider: Prisma.ProviderCreateNestedOneWithoutApiInput
   Favorite?: Prisma.FavoriteCreateNestedManyWithoutApiInput
-  Payment?: Prisma.PaymentCreateNestedManyWithoutApiInput
   Review?: Prisma.ReviewCreateNestedManyWithoutApiInput
   Token?: Prisma.TokenCreateNestedManyWithoutApiInput
   UsageLog?: Prisma.UsageLogCreateNestedManyWithoutApiInput
@@ -571,7 +567,6 @@ export type ApiUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt: Date | string
   Favorite?: Prisma.FavoriteUncheckedCreateNestedManyWithoutApiInput
-  Payment?: Prisma.PaymentUncheckedCreateNestedManyWithoutApiInput
   Review?: Prisma.ReviewUncheckedCreateNestedManyWithoutApiInput
   Token?: Prisma.TokenUncheckedCreateNestedManyWithoutApiInput
   UsageLog?: Prisma.UsageLogUncheckedCreateNestedManyWithoutApiInput
@@ -605,7 +600,6 @@ export type ApiUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Provider?: Prisma.ProviderUpdateOneRequiredWithoutApiNestedInput
   Favorite?: Prisma.FavoriteUpdateManyWithoutApiNestedInput
-  Payment?: Prisma.PaymentUpdateManyWithoutApiNestedInput
   Review?: Prisma.ReviewUpdateManyWithoutApiNestedInput
   Token?: Prisma.TokenUpdateManyWithoutApiNestedInput
   UsageLog?: Prisma.UsageLogUpdateManyWithoutApiNestedInput
@@ -639,7 +633,6 @@ export type ApiUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Favorite?: Prisma.FavoriteUncheckedUpdateManyWithoutApiNestedInput
-  Payment?: Prisma.PaymentUncheckedUpdateManyWithoutApiNestedInput
   Review?: Prisma.ReviewUncheckedUpdateManyWithoutApiNestedInput
   Token?: Prisma.TokenUncheckedUpdateManyWithoutApiNestedInput
   UsageLog?: Prisma.UsageLogUncheckedUpdateManyWithoutApiNestedInput
@@ -820,11 +813,6 @@ export type ApiScalarRelationFilter = {
   isNot?: Prisma.ApiWhereInput
 }
 
-export type ApiNullableScalarRelationFilter = {
-  is?: Prisma.ApiWhereInput | null
-  isNot?: Prisma.ApiWhereInput | null
-}
-
 export type ApiListRelationFilter = {
   every?: Prisma.ApiWhereInput
   some?: Prisma.ApiWhereInput
@@ -879,22 +867,6 @@ export type ApiUpdateOneRequiredWithoutFavoriteNestedInput = {
   upsert?: Prisma.ApiUpsertWithoutFavoriteInput
   connect?: Prisma.ApiWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.ApiUpdateToOneWithWhereWithoutFavoriteInput, Prisma.ApiUpdateWithoutFavoriteInput>, Prisma.ApiUncheckedUpdateWithoutFavoriteInput>
-}
-
-export type ApiCreateNestedOneWithoutPaymentInput = {
-  create?: Prisma.XOR<Prisma.ApiCreateWithoutPaymentInput, Prisma.ApiUncheckedCreateWithoutPaymentInput>
-  connectOrCreate?: Prisma.ApiCreateOrConnectWithoutPaymentInput
-  connect?: Prisma.ApiWhereUniqueInput
-}
-
-export type ApiUpdateOneWithoutPaymentNestedInput = {
-  create?: Prisma.XOR<Prisma.ApiCreateWithoutPaymentInput, Prisma.ApiUncheckedCreateWithoutPaymentInput>
-  connectOrCreate?: Prisma.ApiCreateOrConnectWithoutPaymentInput
-  upsert?: Prisma.ApiUpsertWithoutPaymentInput
-  disconnect?: Prisma.ApiWhereInput | boolean
-  delete?: Prisma.ApiWhereInput | boolean
-  connect?: Prisma.ApiWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ApiUpdateToOneWithWhereWithoutPaymentInput, Prisma.ApiUpdateWithoutPaymentInput>, Prisma.ApiUncheckedUpdateWithoutPaymentInput>
 }
 
 export type ApiCreateNestedManyWithoutProviderInput = {
@@ -1021,7 +993,6 @@ export type ApiCreateWithoutFavoriteInput = {
   createdAt?: Date | string
   updatedAt: Date | string
   Provider: Prisma.ProviderCreateNestedOneWithoutApiInput
-  Payment?: Prisma.PaymentCreateNestedManyWithoutApiInput
   Review?: Prisma.ReviewCreateNestedManyWithoutApiInput
   Token?: Prisma.TokenCreateNestedManyWithoutApiInput
   UsageLog?: Prisma.UsageLogCreateNestedManyWithoutApiInput
@@ -1054,7 +1025,6 @@ export type ApiUncheckedCreateWithoutFavoriteInput = {
   fallbackEndpoint?: string | null
   createdAt?: Date | string
   updatedAt: Date | string
-  Payment?: Prisma.PaymentUncheckedCreateNestedManyWithoutApiInput
   Review?: Prisma.ReviewUncheckedCreateNestedManyWithoutApiInput
   Token?: Prisma.TokenUncheckedCreateNestedManyWithoutApiInput
   UsageLog?: Prisma.UsageLogUncheckedCreateNestedManyWithoutApiInput
@@ -1103,7 +1073,6 @@ export type ApiUpdateWithoutFavoriteInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Provider?: Prisma.ProviderUpdateOneRequiredWithoutApiNestedInput
-  Payment?: Prisma.PaymentUpdateManyWithoutApiNestedInput
   Review?: Prisma.ReviewUpdateManyWithoutApiNestedInput
   Token?: Prisma.TokenUpdateManyWithoutApiNestedInput
   UsageLog?: Prisma.UsageLogUpdateManyWithoutApiNestedInput
@@ -1136,155 +1105,6 @@ export type ApiUncheckedUpdateWithoutFavoriteInput = {
   fallbackEndpoint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  Payment?: Prisma.PaymentUncheckedUpdateManyWithoutApiNestedInput
-  Review?: Prisma.ReviewUncheckedUpdateManyWithoutApiNestedInput
-  Token?: Prisma.TokenUncheckedUpdateManyWithoutApiNestedInput
-  UsageLog?: Prisma.UsageLogUncheckedUpdateManyWithoutApiNestedInput
-  PurchasedApi?: Prisma.PurchasedApiUncheckedUpdateManyWithoutApiNestedInput
-}
-
-export type ApiCreateWithoutPaymentInput = {
-  id: string
-  name: string
-  description: string
-  category: string
-  endpoint: string
-  publicPath: string
-  method?: string
-  pricePerCall: string
-  currency?: string
-  isActive?: boolean
-  totalCalls?: number
-  totalRevenue?: string
-  averageResponseTime?: number
-  uptime?: number
-  documentation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  headers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  queryParams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  internalEndpoint?: string | null
-  internalAuth?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  relayConfiguration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  isDirectRelay?: boolean
-  fallbackEndpoint?: string | null
-  createdAt?: Date | string
-  updatedAt: Date | string
-  Provider: Prisma.ProviderCreateNestedOneWithoutApiInput
-  Favorite?: Prisma.FavoriteCreateNestedManyWithoutApiInput
-  Review?: Prisma.ReviewCreateNestedManyWithoutApiInput
-  Token?: Prisma.TokenCreateNestedManyWithoutApiInput
-  UsageLog?: Prisma.UsageLogCreateNestedManyWithoutApiInput
-  PurchasedApi?: Prisma.PurchasedApiCreateNestedManyWithoutApiInput
-}
-
-export type ApiUncheckedCreateWithoutPaymentInput = {
-  id: string
-  providerId: string
-  name: string
-  description: string
-  category: string
-  endpoint: string
-  publicPath: string
-  method?: string
-  pricePerCall: string
-  currency?: string
-  isActive?: boolean
-  totalCalls?: number
-  totalRevenue?: string
-  averageResponseTime?: number
-  uptime?: number
-  documentation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  headers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  queryParams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  internalEndpoint?: string | null
-  internalAuth?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  relayConfiguration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  isDirectRelay?: boolean
-  fallbackEndpoint?: string | null
-  createdAt?: Date | string
-  updatedAt: Date | string
-  Favorite?: Prisma.FavoriteUncheckedCreateNestedManyWithoutApiInput
-  Review?: Prisma.ReviewUncheckedCreateNestedManyWithoutApiInput
-  Token?: Prisma.TokenUncheckedCreateNestedManyWithoutApiInput
-  UsageLog?: Prisma.UsageLogUncheckedCreateNestedManyWithoutApiInput
-  PurchasedApi?: Prisma.PurchasedApiUncheckedCreateNestedManyWithoutApiInput
-}
-
-export type ApiCreateOrConnectWithoutPaymentInput = {
-  where: Prisma.ApiWhereUniqueInput
-  create: Prisma.XOR<Prisma.ApiCreateWithoutPaymentInput, Prisma.ApiUncheckedCreateWithoutPaymentInput>
-}
-
-export type ApiUpsertWithoutPaymentInput = {
-  update: Prisma.XOR<Prisma.ApiUpdateWithoutPaymentInput, Prisma.ApiUncheckedUpdateWithoutPaymentInput>
-  create: Prisma.XOR<Prisma.ApiCreateWithoutPaymentInput, Prisma.ApiUncheckedCreateWithoutPaymentInput>
-  where?: Prisma.ApiWhereInput
-}
-
-export type ApiUpdateToOneWithWhereWithoutPaymentInput = {
-  where?: Prisma.ApiWhereInput
-  data: Prisma.XOR<Prisma.ApiUpdateWithoutPaymentInput, Prisma.ApiUncheckedUpdateWithoutPaymentInput>
-}
-
-export type ApiUpdateWithoutPaymentInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.StringFieldUpdateOperationsInput | string
-  endpoint?: Prisma.StringFieldUpdateOperationsInput | string
-  publicPath?: Prisma.StringFieldUpdateOperationsInput | string
-  method?: Prisma.StringFieldUpdateOperationsInput | string
-  pricePerCall?: Prisma.StringFieldUpdateOperationsInput | string
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  totalCalls?: Prisma.IntFieldUpdateOperationsInput | number
-  totalRevenue?: Prisma.StringFieldUpdateOperationsInput | string
-  averageResponseTime?: Prisma.IntFieldUpdateOperationsInput | number
-  uptime?: Prisma.FloatFieldUpdateOperationsInput | number
-  documentation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  headers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  queryParams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  internalEndpoint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  internalAuth?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  relayConfiguration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  isDirectRelay?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  fallbackEndpoint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  Provider?: Prisma.ProviderUpdateOneRequiredWithoutApiNestedInput
-  Favorite?: Prisma.FavoriteUpdateManyWithoutApiNestedInput
-  Review?: Prisma.ReviewUpdateManyWithoutApiNestedInput
-  Token?: Prisma.TokenUpdateManyWithoutApiNestedInput
-  UsageLog?: Prisma.UsageLogUpdateManyWithoutApiNestedInput
-  PurchasedApi?: Prisma.PurchasedApiUpdateManyWithoutApiNestedInput
-}
-
-export type ApiUncheckedUpdateWithoutPaymentInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  providerId?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.StringFieldUpdateOperationsInput | string
-  endpoint?: Prisma.StringFieldUpdateOperationsInput | string
-  publicPath?: Prisma.StringFieldUpdateOperationsInput | string
-  method?: Prisma.StringFieldUpdateOperationsInput | string
-  pricePerCall?: Prisma.StringFieldUpdateOperationsInput | string
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  totalCalls?: Prisma.IntFieldUpdateOperationsInput | number
-  totalRevenue?: Prisma.StringFieldUpdateOperationsInput | string
-  averageResponseTime?: Prisma.IntFieldUpdateOperationsInput | number
-  uptime?: Prisma.FloatFieldUpdateOperationsInput | number
-  documentation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  headers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  queryParams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  internalEndpoint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  internalAuth?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  relayConfiguration?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  isDirectRelay?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  fallbackEndpoint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  Favorite?: Prisma.FavoriteUncheckedUpdateManyWithoutApiNestedInput
   Review?: Prisma.ReviewUncheckedUpdateManyWithoutApiNestedInput
   Token?: Prisma.TokenUncheckedUpdateManyWithoutApiNestedInput
   UsageLog?: Prisma.UsageLogUncheckedUpdateManyWithoutApiNestedInput
@@ -1317,7 +1137,6 @@ export type ApiCreateWithoutProviderInput = {
   createdAt?: Date | string
   updatedAt: Date | string
   Favorite?: Prisma.FavoriteCreateNestedManyWithoutApiInput
-  Payment?: Prisma.PaymentCreateNestedManyWithoutApiInput
   Review?: Prisma.ReviewCreateNestedManyWithoutApiInput
   Token?: Prisma.TokenCreateNestedManyWithoutApiInput
   UsageLog?: Prisma.UsageLogCreateNestedManyWithoutApiInput
@@ -1350,7 +1169,6 @@ export type ApiUncheckedCreateWithoutProviderInput = {
   createdAt?: Date | string
   updatedAt: Date | string
   Favorite?: Prisma.FavoriteUncheckedCreateNestedManyWithoutApiInput
-  Payment?: Prisma.PaymentUncheckedCreateNestedManyWithoutApiInput
   Review?: Prisma.ReviewUncheckedCreateNestedManyWithoutApiInput
   Token?: Prisma.TokenUncheckedCreateNestedManyWithoutApiInput
   UsageLog?: Prisma.UsageLogUncheckedCreateNestedManyWithoutApiInput
@@ -1441,7 +1259,6 @@ export type ApiCreateWithoutReviewInput = {
   updatedAt: Date | string
   Provider: Prisma.ProviderCreateNestedOneWithoutApiInput
   Favorite?: Prisma.FavoriteCreateNestedManyWithoutApiInput
-  Payment?: Prisma.PaymentCreateNestedManyWithoutApiInput
   Token?: Prisma.TokenCreateNestedManyWithoutApiInput
   UsageLog?: Prisma.UsageLogCreateNestedManyWithoutApiInput
   PurchasedApi?: Prisma.PurchasedApiCreateNestedManyWithoutApiInput
@@ -1474,7 +1291,6 @@ export type ApiUncheckedCreateWithoutReviewInput = {
   createdAt?: Date | string
   updatedAt: Date | string
   Favorite?: Prisma.FavoriteUncheckedCreateNestedManyWithoutApiInput
-  Payment?: Prisma.PaymentUncheckedCreateNestedManyWithoutApiInput
   Token?: Prisma.TokenUncheckedCreateNestedManyWithoutApiInput
   UsageLog?: Prisma.UsageLogUncheckedCreateNestedManyWithoutApiInput
   PurchasedApi?: Prisma.PurchasedApiUncheckedCreateNestedManyWithoutApiInput
@@ -1523,7 +1339,6 @@ export type ApiUpdateWithoutReviewInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Provider?: Prisma.ProviderUpdateOneRequiredWithoutApiNestedInput
   Favorite?: Prisma.FavoriteUpdateManyWithoutApiNestedInput
-  Payment?: Prisma.PaymentUpdateManyWithoutApiNestedInput
   Token?: Prisma.TokenUpdateManyWithoutApiNestedInput
   UsageLog?: Prisma.UsageLogUpdateManyWithoutApiNestedInput
   PurchasedApi?: Prisma.PurchasedApiUpdateManyWithoutApiNestedInput
@@ -1556,7 +1371,6 @@ export type ApiUncheckedUpdateWithoutReviewInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Favorite?: Prisma.FavoriteUncheckedUpdateManyWithoutApiNestedInput
-  Payment?: Prisma.PaymentUncheckedUpdateManyWithoutApiNestedInput
   Token?: Prisma.TokenUncheckedUpdateManyWithoutApiNestedInput
   UsageLog?: Prisma.UsageLogUncheckedUpdateManyWithoutApiNestedInput
   PurchasedApi?: Prisma.PurchasedApiUncheckedUpdateManyWithoutApiNestedInput
@@ -1589,7 +1403,6 @@ export type ApiCreateWithoutTokenInput = {
   updatedAt: Date | string
   Provider: Prisma.ProviderCreateNestedOneWithoutApiInput
   Favorite?: Prisma.FavoriteCreateNestedManyWithoutApiInput
-  Payment?: Prisma.PaymentCreateNestedManyWithoutApiInput
   Review?: Prisma.ReviewCreateNestedManyWithoutApiInput
   UsageLog?: Prisma.UsageLogCreateNestedManyWithoutApiInput
   PurchasedApi?: Prisma.PurchasedApiCreateNestedManyWithoutApiInput
@@ -1622,7 +1435,6 @@ export type ApiUncheckedCreateWithoutTokenInput = {
   createdAt?: Date | string
   updatedAt: Date | string
   Favorite?: Prisma.FavoriteUncheckedCreateNestedManyWithoutApiInput
-  Payment?: Prisma.PaymentUncheckedCreateNestedManyWithoutApiInput
   Review?: Prisma.ReviewUncheckedCreateNestedManyWithoutApiInput
   UsageLog?: Prisma.UsageLogUncheckedCreateNestedManyWithoutApiInput
   PurchasedApi?: Prisma.PurchasedApiUncheckedCreateNestedManyWithoutApiInput
@@ -1671,7 +1483,6 @@ export type ApiUpdateWithoutTokenInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Provider?: Prisma.ProviderUpdateOneRequiredWithoutApiNestedInput
   Favorite?: Prisma.FavoriteUpdateManyWithoutApiNestedInput
-  Payment?: Prisma.PaymentUpdateManyWithoutApiNestedInput
   Review?: Prisma.ReviewUpdateManyWithoutApiNestedInput
   UsageLog?: Prisma.UsageLogUpdateManyWithoutApiNestedInput
   PurchasedApi?: Prisma.PurchasedApiUpdateManyWithoutApiNestedInput
@@ -1704,7 +1515,6 @@ export type ApiUncheckedUpdateWithoutTokenInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Favorite?: Prisma.FavoriteUncheckedUpdateManyWithoutApiNestedInput
-  Payment?: Prisma.PaymentUncheckedUpdateManyWithoutApiNestedInput
   Review?: Prisma.ReviewUncheckedUpdateManyWithoutApiNestedInput
   UsageLog?: Prisma.UsageLogUncheckedUpdateManyWithoutApiNestedInput
   PurchasedApi?: Prisma.PurchasedApiUncheckedUpdateManyWithoutApiNestedInput
@@ -1737,7 +1547,6 @@ export type ApiCreateWithoutPurchasedApiInput = {
   updatedAt: Date | string
   Provider: Prisma.ProviderCreateNestedOneWithoutApiInput
   Favorite?: Prisma.FavoriteCreateNestedManyWithoutApiInput
-  Payment?: Prisma.PaymentCreateNestedManyWithoutApiInput
   Review?: Prisma.ReviewCreateNestedManyWithoutApiInput
   Token?: Prisma.TokenCreateNestedManyWithoutApiInput
   UsageLog?: Prisma.UsageLogCreateNestedManyWithoutApiInput
@@ -1770,7 +1579,6 @@ export type ApiUncheckedCreateWithoutPurchasedApiInput = {
   createdAt?: Date | string
   updatedAt: Date | string
   Favorite?: Prisma.FavoriteUncheckedCreateNestedManyWithoutApiInput
-  Payment?: Prisma.PaymentUncheckedCreateNestedManyWithoutApiInput
   Review?: Prisma.ReviewUncheckedCreateNestedManyWithoutApiInput
   Token?: Prisma.TokenUncheckedCreateNestedManyWithoutApiInput
   UsageLog?: Prisma.UsageLogUncheckedCreateNestedManyWithoutApiInput
@@ -1819,7 +1627,6 @@ export type ApiUpdateWithoutPurchasedApiInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Provider?: Prisma.ProviderUpdateOneRequiredWithoutApiNestedInput
   Favorite?: Prisma.FavoriteUpdateManyWithoutApiNestedInput
-  Payment?: Prisma.PaymentUpdateManyWithoutApiNestedInput
   Review?: Prisma.ReviewUpdateManyWithoutApiNestedInput
   Token?: Prisma.TokenUpdateManyWithoutApiNestedInput
   UsageLog?: Prisma.UsageLogUpdateManyWithoutApiNestedInput
@@ -1852,7 +1659,6 @@ export type ApiUncheckedUpdateWithoutPurchasedApiInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Favorite?: Prisma.FavoriteUncheckedUpdateManyWithoutApiNestedInput
-  Payment?: Prisma.PaymentUncheckedUpdateManyWithoutApiNestedInput
   Review?: Prisma.ReviewUncheckedUpdateManyWithoutApiNestedInput
   Token?: Prisma.TokenUncheckedUpdateManyWithoutApiNestedInput
   UsageLog?: Prisma.UsageLogUncheckedUpdateManyWithoutApiNestedInput
@@ -1885,7 +1691,6 @@ export type ApiCreateWithoutUsageLogInput = {
   updatedAt: Date | string
   Provider: Prisma.ProviderCreateNestedOneWithoutApiInput
   Favorite?: Prisma.FavoriteCreateNestedManyWithoutApiInput
-  Payment?: Prisma.PaymentCreateNestedManyWithoutApiInput
   Review?: Prisma.ReviewCreateNestedManyWithoutApiInput
   Token?: Prisma.TokenCreateNestedManyWithoutApiInput
   PurchasedApi?: Prisma.PurchasedApiCreateNestedManyWithoutApiInput
@@ -1918,7 +1723,6 @@ export type ApiUncheckedCreateWithoutUsageLogInput = {
   createdAt?: Date | string
   updatedAt: Date | string
   Favorite?: Prisma.FavoriteUncheckedCreateNestedManyWithoutApiInput
-  Payment?: Prisma.PaymentUncheckedCreateNestedManyWithoutApiInput
   Review?: Prisma.ReviewUncheckedCreateNestedManyWithoutApiInput
   Token?: Prisma.TokenUncheckedCreateNestedManyWithoutApiInput
   PurchasedApi?: Prisma.PurchasedApiUncheckedCreateNestedManyWithoutApiInput
@@ -1967,7 +1771,6 @@ export type ApiUpdateWithoutUsageLogInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Provider?: Prisma.ProviderUpdateOneRequiredWithoutApiNestedInput
   Favorite?: Prisma.FavoriteUpdateManyWithoutApiNestedInput
-  Payment?: Prisma.PaymentUpdateManyWithoutApiNestedInput
   Review?: Prisma.ReviewUpdateManyWithoutApiNestedInput
   Token?: Prisma.TokenUpdateManyWithoutApiNestedInput
   PurchasedApi?: Prisma.PurchasedApiUpdateManyWithoutApiNestedInput
@@ -2000,7 +1803,6 @@ export type ApiUncheckedUpdateWithoutUsageLogInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Favorite?: Prisma.FavoriteUncheckedUpdateManyWithoutApiNestedInput
-  Payment?: Prisma.PaymentUncheckedUpdateManyWithoutApiNestedInput
   Review?: Prisma.ReviewUncheckedUpdateManyWithoutApiNestedInput
   Token?: Prisma.TokenUncheckedUpdateManyWithoutApiNestedInput
   PurchasedApi?: Prisma.PurchasedApiUncheckedUpdateManyWithoutApiNestedInput
@@ -2059,7 +1861,6 @@ export type ApiUpdateWithoutProviderInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Favorite?: Prisma.FavoriteUpdateManyWithoutApiNestedInput
-  Payment?: Prisma.PaymentUpdateManyWithoutApiNestedInput
   Review?: Prisma.ReviewUpdateManyWithoutApiNestedInput
   Token?: Prisma.TokenUpdateManyWithoutApiNestedInput
   UsageLog?: Prisma.UsageLogUpdateManyWithoutApiNestedInput
@@ -2092,7 +1893,6 @@ export type ApiUncheckedUpdateWithoutProviderInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Favorite?: Prisma.FavoriteUncheckedUpdateManyWithoutApiNestedInput
-  Payment?: Prisma.PaymentUncheckedUpdateManyWithoutApiNestedInput
   Review?: Prisma.ReviewUncheckedUpdateManyWithoutApiNestedInput
   Token?: Prisma.TokenUncheckedUpdateManyWithoutApiNestedInput
   UsageLog?: Prisma.UsageLogUncheckedUpdateManyWithoutApiNestedInput
@@ -2133,7 +1933,6 @@ export type ApiUncheckedUpdateManyWithoutProviderInput = {
 
 export type ApiCountOutputType = {
   Favorite: number
-  Payment: number
   Review: number
   Token: number
   UsageLog: number
@@ -2142,7 +1941,6 @@ export type ApiCountOutputType = {
 
 export type ApiCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   Favorite?: boolean | ApiCountOutputTypeCountFavoriteArgs
-  Payment?: boolean | ApiCountOutputTypeCountPaymentArgs
   Review?: boolean | ApiCountOutputTypeCountReviewArgs
   Token?: boolean | ApiCountOutputTypeCountTokenArgs
   UsageLog?: boolean | ApiCountOutputTypeCountUsageLogArgs
@@ -2164,13 +1962,6 @@ export type ApiCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensio
  */
 export type ApiCountOutputTypeCountFavoriteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.FavoriteWhereInput
-}
-
-/**
- * ApiCountOutputType without action
- */
-export type ApiCountOutputTypeCountPaymentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.PaymentWhereInput
 }
 
 /**
@@ -2230,7 +2021,6 @@ export type ApiSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = ru
   updatedAt?: boolean
   Provider?: boolean | Prisma.ProviderDefaultArgs<ExtArgs>
   Favorite?: boolean | Prisma.Api$FavoriteArgs<ExtArgs>
-  Payment?: boolean | Prisma.Api$PaymentArgs<ExtArgs>
   Review?: boolean | Prisma.Api$ReviewArgs<ExtArgs>
   Token?: boolean | Prisma.Api$TokenArgs<ExtArgs>
   UsageLog?: boolean | Prisma.Api$UsageLogArgs<ExtArgs>
@@ -2328,7 +2118,6 @@ export type ApiOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
 export type ApiInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   Provider?: boolean | Prisma.ProviderDefaultArgs<ExtArgs>
   Favorite?: boolean | Prisma.Api$FavoriteArgs<ExtArgs>
-  Payment?: boolean | Prisma.Api$PaymentArgs<ExtArgs>
   Review?: boolean | Prisma.Api$ReviewArgs<ExtArgs>
   Token?: boolean | Prisma.Api$TokenArgs<ExtArgs>
   UsageLog?: boolean | Prisma.Api$UsageLogArgs<ExtArgs>
@@ -2347,7 +2136,6 @@ export type $ApiPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   objects: {
     Provider: Prisma.$ProviderPayload<ExtArgs>
     Favorite: Prisma.$FavoritePayload<ExtArgs>[]
-    Payment: Prisma.$PaymentPayload<ExtArgs>[]
     Review: Prisma.$ReviewPayload<ExtArgs>[]
     Token: Prisma.$TokenPayload<ExtArgs>[]
     UsageLog: Prisma.$UsageLogPayload<ExtArgs>[]
@@ -2775,7 +2563,6 @@ export interface Prisma__ApiClient<T, Null = never, ExtArgs extends runtime.Type
   readonly [Symbol.toStringTag]: "PrismaPromise"
   Provider<T extends Prisma.ProviderDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProviderDefaultArgs<ExtArgs>>): Prisma.Prisma__ProviderClient<runtime.Types.Result.GetResult<Prisma.$ProviderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   Favorite<T extends Prisma.Api$FavoriteArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Api$FavoriteArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FavoritePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  Payment<T extends Prisma.Api$PaymentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Api$PaymentArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   Review<T extends Prisma.Api$ReviewArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Api$ReviewArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   Token<T extends Prisma.Api$TokenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Api$TokenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   UsageLog<T extends Prisma.Api$UsageLogArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Api$UsageLogArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UsageLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -3251,30 +3038,6 @@ export type Api$FavoriteArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
   take?: number
   skip?: number
   distinct?: Prisma.FavoriteScalarFieldEnum | Prisma.FavoriteScalarFieldEnum[]
-}
-
-/**
- * Api.Payment
- */
-export type Api$PaymentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Payment
-   */
-  select?: Prisma.PaymentSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Payment
-   */
-  omit?: Prisma.PaymentOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.PaymentInclude<ExtArgs> | null
-  where?: Prisma.PaymentWhereInput
-  orderBy?: Prisma.PaymentOrderByWithRelationInput | Prisma.PaymentOrderByWithRelationInput[]
-  cursor?: Prisma.PaymentWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.PaymentScalarFieldEnum | Prisma.PaymentScalarFieldEnum[]
 }
 
 /**

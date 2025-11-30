@@ -54,7 +54,6 @@ export const ModelName = {
   Api: 'Api',
   ApiKey: 'ApiKey',
   Favorite: 'Favorite',
-  Payment: 'Payment',
   Provider: 'Provider',
   Review: 'Review',
   Token: 'Token',
@@ -136,27 +135,6 @@ export const FavoriteScalarFieldEnum = {
 export type FavoriteScalarFieldEnum = (typeof FavoriteScalarFieldEnum)[keyof typeof FavoriteScalarFieldEnum]
 
 
-export const PaymentScalarFieldEnum = {
-  id: 'id',
-  providerId: 'providerId',
-  developerAddress: 'developerAddress',
-  transactionHash: 'transactionHash',
-  amount: 'amount',
-  currency: 'currency',
-  numberOfTokens: 'numberOfTokens',
-  tokensIssued: 'tokensIssued',
-  blockNumber: 'blockNumber',
-  blockTimestamp: 'blockTimestamp',
-  isVerified: 'isVerified',
-  isReplay: 'isReplay',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  apiId: 'apiId'
-} as const
-
-export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
-
-
 export const ProviderScalarFieldEnum = {
   id: 'id',
   walletAddress: 'walletAddress',
@@ -193,7 +171,6 @@ export type ReviewScalarFieldEnum = (typeof ReviewScalarFieldEnum)[keyof typeof 
 
 export const TokenScalarFieldEnum = {
   id: 'id',
-  paymentId: 'paymentId',
   apiId: 'apiId',
   providerId: 'providerId',
   developerAddress: 'developerAddress',

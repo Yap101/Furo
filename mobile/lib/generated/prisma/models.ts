@@ -11,7 +11,6 @@
 export type * from './models/Api'
 export type * from './models/ApiKey'
 export type * from './models/Favorite'
-export type * from './models/Payment'
 export type * from './models/Provider'
 export type * from './models/Review'
 export type * from './models/Token'

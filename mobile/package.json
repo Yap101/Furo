@@ -39,13 +39,12 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
-    "@prisma/client": "^7.0.0",
-    "@prisma/config": "^7.0.0",
+    "@prisma/client": "^7.0.1",
     "@types/node": "^24.10.1",
     "@types/react": "~19.1.10",
     "@walletconnect/types": "^2.23.0",
     "dotenv": "^17.2.3",
-    "prisma": "^7.0.0",
+    "prisma": "^7.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.0.0"
   }

@@ -7,5 +7,10 @@
     "android": "pnpm -C mobile android",
     "ios": "pnpm -C mobile ios",
     "web": "pnpm -C mobile web"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "dotenv": "^17.2.3",
+    "prisma": "^7.0.1"
   }
 }

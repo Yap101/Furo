@@ -26,7 +26,6 @@ export type AggregateToken = {
 
 export type TokenMinAggregateOutputType = {
   id: string | null
-  paymentId: string | null
   apiId: string | null
   providerId: string | null
   developerAddress: string | null
@@ -40,7 +39,6 @@ export type TokenMinAggregateOutputType = {
 
 export type TokenMaxAggregateOutputType = {
   id: string | null
-  paymentId: string | null
   apiId: string | null
   providerId: string | null
   developerAddress: string | null
@@ -54,7 +52,6 @@ export type TokenMaxAggregateOutputType = {
 
 export type TokenCountAggregateOutputType = {
   id: number
-  paymentId: number
   apiId: number
   providerId: number
   developerAddress: number
@@ -71,7 +68,6 @@ export type TokenCountAggregateOutputType = {
 
 export type TokenMinAggregateInputType = {
   id?: true
-  paymentId?: true
   apiId?: true
   providerId?: true
   developerAddress?: true
@@ -85,7 +81,6 @@ export type TokenMinAggregateInputType = {
 
 export type TokenMaxAggregateInputType = {
   id?: true
-  paymentId?: true
   apiId?: true
   providerId?: true
   developerAddress?: true
@@ -99,7 +94,6 @@ export type TokenMaxAggregateInputType = {
 
 export type TokenCountAggregateInputType = {
   id?: true
-  paymentId?: true
   apiId?: true
   providerId?: true
   developerAddress?: true
@@ -187,7 +181,6 @@ export type TokenGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
 
 export type TokenGroupByOutputType = {
   id: string
-  paymentId: string
   apiId: string
   providerId: string
   developerAddress: string
@@ -223,7 +216,6 @@ export type TokenWhereInput = {
   OR?: Prisma.TokenWhereInput[]
   NOT?: Prisma.TokenWhereInput | Prisma.TokenWhereInput[]
   id?: Prisma.StringFilter<"Token"> | string
-  paymentId?: Prisma.StringFilter<"Token"> | string
   apiId?: Prisma.StringFilter<"Token"> | string
   providerId?: Prisma.StringFilter<"Token"> | string
   developerAddress?: Prisma.StringFilter<"Token"> | string
@@ -235,14 +227,12 @@ export type TokenWhereInput = {
   requestMetadata?: Prisma.JsonNullableFilter<"Token">
   createdAt?: Prisma.DateTimeFilter<"Token"> | Date | string
   Api?: Prisma.XOR<Prisma.ApiScalarRelationFilter, Prisma.ApiWhereInput>
-  Payment?: Prisma.XOR<Prisma.PaymentScalarRelationFilter, Prisma.PaymentWhereInput>
   Provider?: Prisma.XOR<Prisma.ProviderScalarRelationFilter, Prisma.ProviderWhereInput>
   UsageLog?: Prisma.XOR<Prisma.UsageLogNullableScalarRelationFilter, Prisma.UsageLogWhereInput> | null
 }
 
 export type TokenOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  paymentId?: Prisma.SortOrder
   apiId?: Prisma.SortOrder
   providerId?: Prisma.SortOrder
   developerAddress?: Prisma.SortOrder
@@ -254,7 +244,6 @@ export type TokenOrderByWithRelationInput = {
   requestMetadata?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   Api?: Prisma.ApiOrderByWithRelationInput
-  Payment?: Prisma.PaymentOrderByWithRelationInput
   Provider?: Prisma.ProviderOrderByWithRelationInput
   UsageLog?: Prisma.UsageLogOrderByWithRelationInput
 }
@@ -265,7 +254,6 @@ export type TokenWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.TokenWhereInput | Prisma.TokenWhereInput[]
   OR?: Prisma.TokenWhereInput[]
   NOT?: Prisma.TokenWhereInput | Prisma.TokenWhereInput[]
-  paymentId?: Prisma.StringFilter<"Token"> | string
   apiId?: Prisma.StringFilter<"Token"> | string
   providerId?: Prisma.StringFilter<"Token"> | string
   developerAddress?: Prisma.StringFilter<"Token"> | string
@@ -276,14 +264,12 @@ export type TokenWhereUniqueInput = Prisma.AtLeast<{
   requestMetadata?: Prisma.JsonNullableFilter<"Token">
   createdAt?: Prisma.DateTimeFilter<"Token"> | Date | string
   Api?: Prisma.XOR<Prisma.ApiScalarRelationFilter, Prisma.ApiWhereInput>
-  Payment?: Prisma.XOR<Prisma.PaymentScalarRelationFilter, Prisma.PaymentWhereInput>
   Provider?: Prisma.XOR<Prisma.ProviderScalarRelationFilter, Prisma.ProviderWhereInput>
   UsageLog?: Prisma.XOR<Prisma.UsageLogNullableScalarRelationFilter, Prisma.UsageLogWhereInput> | null
 }, "id" | "tokenHash">
 
 export type TokenOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  paymentId?: Prisma.SortOrder
   apiId?: Prisma.SortOrder
   providerId?: Prisma.SortOrder
   developerAddress?: Prisma.SortOrder
@@ -304,7 +290,6 @@ export type TokenScalarWhereWithAggregatesInput = {
   OR?: Prisma.TokenScalarWhereWithAggregatesInput[]
   NOT?: Prisma.TokenScalarWhereWithAggregatesInput | Prisma.TokenScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Token"> | string
-  paymentId?: Prisma.StringWithAggregatesFilter<"Token"> | string
   apiId?: Prisma.StringWithAggregatesFilter<"Token"> | string
   providerId?: Prisma.StringWithAggregatesFilter<"Token"> | string
   developerAddress?: Prisma.StringWithAggregatesFilter<"Token"> | string
@@ -328,14 +313,12 @@ export type TokenCreateInput = {
   requestMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   Api: Prisma.ApiCreateNestedOneWithoutTokenInput
-  Payment: Prisma.PaymentCreateNestedOneWithoutTokenInput
   Provider: Prisma.ProviderCreateNestedOneWithoutTokenInput
   UsageLog?: Prisma.UsageLogCreateNestedOneWithoutTokenInput
 }
 
 export type TokenUncheckedCreateInput = {
   id: string
-  paymentId: string
   apiId: string
   providerId: string
   developerAddress: string
@@ -360,14 +343,12 @@ export type TokenUpdateInput = {
   requestMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Api?: Prisma.ApiUpdateOneRequiredWithoutTokenNestedInput
-  Payment?: Prisma.PaymentUpdateOneRequiredWithoutTokenNestedInput
   Provider?: Prisma.ProviderUpdateOneRequiredWithoutTokenNestedInput
   UsageLog?: Prisma.UsageLogUpdateOneWithoutTokenNestedInput
 }
 
 export type TokenUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  paymentId?: Prisma.StringFieldUpdateOperationsInput | string
   apiId?: Prisma.StringFieldUpdateOperationsInput | string
   providerId?: Prisma.StringFieldUpdateOperationsInput | string
   developerAddress?: Prisma.StringFieldUpdateOperationsInput | string
@@ -383,7 +364,6 @@ export type TokenUncheckedUpdateInput = {
 
 export type TokenCreateManyInput = {
   id: string
-  paymentId: string
   apiId: string
   providerId: string
   developerAddress: string
@@ -410,7 +390,6 @@ export type TokenUpdateManyMutationInput = {
 
 export type TokenUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  paymentId?: Prisma.StringFieldUpdateOperationsInput | string
   apiId?: Prisma.StringFieldUpdateOperationsInput | string
   providerId?: Prisma.StringFieldUpdateOperationsInput | string
   developerAddress?: Prisma.StringFieldUpdateOperationsInput | string
@@ -435,7 +414,6 @@ export type TokenOrderByRelationAggregateInput = {
 
 export type TokenCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  paymentId?: Prisma.SortOrder
   apiId?: Prisma.SortOrder
   providerId?: Prisma.SortOrder
   developerAddress?: Prisma.SortOrder
@@ -450,7 +428,6 @@ export type TokenCountOrderByAggregateInput = {
 
 export type TokenMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  paymentId?: Prisma.SortOrder
   apiId?: Prisma.SortOrder
   providerId?: Prisma.SortOrder
   developerAddress?: Prisma.SortOrder
@@ -464,7 +441,6 @@ export type TokenMaxOrderByAggregateInput = {
 
 export type TokenMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  paymentId?: Prisma.SortOrder
   apiId?: Prisma.SortOrder
   providerId?: Prisma.SortOrder
   developerAddress?: Prisma.SortOrder
@@ -520,48 +496,6 @@ export type TokenUncheckedUpdateManyWithoutApiNestedInput = {
   connect?: Prisma.TokenWhereUniqueInput | Prisma.TokenWhereUniqueInput[]
   update?: Prisma.TokenUpdateWithWhereUniqueWithoutApiInput | Prisma.TokenUpdateWithWhereUniqueWithoutApiInput[]
   updateMany?: Prisma.TokenUpdateManyWithWhereWithoutApiInput | Prisma.TokenUpdateManyWithWhereWithoutApiInput[]
-  deleteMany?: Prisma.TokenScalarWhereInput | Prisma.TokenScalarWhereInput[]
-}
-
-export type TokenCreateNestedManyWithoutPaymentInput = {
-  create?: Prisma.XOR<Prisma.TokenCreateWithoutPaymentInput, Prisma.TokenUncheckedCreateWithoutPaymentInput> | Prisma.TokenCreateWithoutPaymentInput[] | Prisma.TokenUncheckedCreateWithoutPaymentInput[]
-  connectOrCreate?: Prisma.TokenCreateOrConnectWithoutPaymentInput | Prisma.TokenCreateOrConnectWithoutPaymentInput[]
-  createMany?: Prisma.TokenCreateManyPaymentInputEnvelope
-  connect?: Prisma.TokenWhereUniqueInput | Prisma.TokenWhereUniqueInput[]
-}
-
-export type TokenUncheckedCreateNestedManyWithoutPaymentInput = {
-  create?: Prisma.XOR<Prisma.TokenCreateWithoutPaymentInput, Prisma.TokenUncheckedCreateWithoutPaymentInput> | Prisma.TokenCreateWithoutPaymentInput[] | Prisma.TokenUncheckedCreateWithoutPaymentInput[]
-  connectOrCreate?: Prisma.TokenCreateOrConnectWithoutPaymentInput | Prisma.TokenCreateOrConnectWithoutPaymentInput[]
-  createMany?: Prisma.TokenCreateManyPaymentInputEnvelope
-  connect?: Prisma.TokenWhereUniqueInput | Prisma.TokenWhereUniqueInput[]
-}
-
-export type TokenUpdateManyWithoutPaymentNestedInput = {
-  create?: Prisma.XOR<Prisma.TokenCreateWithoutPaymentInput, Prisma.TokenUncheckedCreateWithoutPaymentInput> | Prisma.TokenCreateWithoutPaymentInput[] | Prisma.TokenUncheckedCreateWithoutPaymentInput[]
-  connectOrCreate?: Prisma.TokenCreateOrConnectWithoutPaymentInput | Prisma.TokenCreateOrConnectWithoutPaymentInput[]
-  upsert?: Prisma.TokenUpsertWithWhereUniqueWithoutPaymentInput | Prisma.TokenUpsertWithWhereUniqueWithoutPaymentInput[]
-  createMany?: Prisma.TokenCreateManyPaymentInputEnvelope
-  set?: Prisma.TokenWhereUniqueInput | Prisma.TokenWhereUniqueInput[]
-  disconnect?: Prisma.TokenWhereUniqueInput | Prisma.TokenWhereUniqueInput[]
-  delete?: Prisma.TokenWhereUniqueInput | Prisma.TokenWhereUniqueInput[]
-  connect?: Prisma.TokenWhereUniqueInput | Prisma.TokenWhereUniqueInput[]
-  update?: Prisma.TokenUpdateWithWhereUniqueWithoutPaymentInput | Prisma.TokenUpdateWithWhereUniqueWithoutPaymentInput[]
-  updateMany?: Prisma.TokenUpdateManyWithWhereWithoutPaymentInput | Prisma.TokenUpdateManyWithWhereWithoutPaymentInput[]
-  deleteMany?: Prisma.TokenScalarWhereInput | Prisma.TokenScalarWhereInput[]
-}
-
-export type TokenUncheckedUpdateManyWithoutPaymentNestedInput = {
-  create?: Prisma.XOR<Prisma.TokenCreateWithoutPaymentInput, Prisma.TokenUncheckedCreateWithoutPaymentInput> | Prisma.TokenCreateWithoutPaymentInput[] | Prisma.TokenUncheckedCreateWithoutPaymentInput[]
-  connectOrCreate?: Prisma.TokenCreateOrConnectWithoutPaymentInput | Prisma.TokenCreateOrConnectWithoutPaymentInput[]
-  upsert?: Prisma.TokenUpsertWithWhereUniqueWithoutPaymentInput | Prisma.TokenUpsertWithWhereUniqueWithoutPaymentInput[]
-  createMany?: Prisma.TokenCreateManyPaymentInputEnvelope
-  set?: Prisma.TokenWhereUniqueInput | Prisma.TokenWhereUniqueInput[]
-  disconnect?: Prisma.TokenWhereUniqueInput | Prisma.TokenWhereUniqueInput[]
-  delete?: Prisma.TokenWhereUniqueInput | Prisma.TokenWhereUniqueInput[]
-  connect?: Prisma.TokenWhereUniqueInput | Prisma.TokenWhereUniqueInput[]
-  update?: Prisma.TokenUpdateWithWhereUniqueWithoutPaymentInput | Prisma.TokenUpdateWithWhereUniqueWithoutPaymentInput[]
-  updateMany?: Prisma.TokenUpdateManyWithWhereWithoutPaymentInput | Prisma.TokenUpdateManyWithWhereWithoutPaymentInput[]
   deleteMany?: Prisma.TokenScalarWhereInput | Prisma.TokenScalarWhereInput[]
 }
 
@@ -631,14 +565,12 @@ export type TokenCreateWithoutApiInput = {
   lastValidAfter: Date | string
   requestMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
-  Payment: Prisma.PaymentCreateNestedOneWithoutTokenInput
   Provider: Prisma.ProviderCreateNestedOneWithoutTokenInput
   UsageLog?: Prisma.UsageLogCreateNestedOneWithoutTokenInput
 }
 
 export type TokenUncheckedCreateWithoutApiInput = {
   id: string
-  paymentId: string
   providerId: string
   developerAddress: string
   tokenHash: string
@@ -682,7 +614,6 @@ export type TokenScalarWhereInput = {
   OR?: Prisma.TokenScalarWhereInput[]
   NOT?: Prisma.TokenScalarWhereInput | Prisma.TokenScalarWhereInput[]
   id?: Prisma.StringFilter<"Token"> | string
-  paymentId?: Prisma.StringFilter<"Token"> | string
   apiId?: Prisma.StringFilter<"Token"> | string
   providerId?: Prisma.StringFilter<"Token"> | string
   developerAddress?: Prisma.StringFilter<"Token"> | string
@@ -693,62 +624,6 @@ export type TokenScalarWhereInput = {
   lastValidAfter?: Prisma.DateTimeFilter<"Token"> | Date | string
   requestMetadata?: Prisma.JsonNullableFilter<"Token">
   createdAt?: Prisma.DateTimeFilter<"Token"> | Date | string
-}
-
-export type TokenCreateWithoutPaymentInput = {
-  id: string
-  developerAddress: string
-  tokenHash: string
-  isUsed?: boolean
-  usedAt?: Date | string | null
-  expiresAt: Date | string
-  lastValidAfter: Date | string
-  requestMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  createdAt?: Date | string
-  Api: Prisma.ApiCreateNestedOneWithoutTokenInput
-  Provider: Prisma.ProviderCreateNestedOneWithoutTokenInput
-  UsageLog?: Prisma.UsageLogCreateNestedOneWithoutTokenInput
-}
-
-export type TokenUncheckedCreateWithoutPaymentInput = {
-  id: string
-  apiId: string
-  providerId: string
-  developerAddress: string
-  tokenHash: string
-  isUsed?: boolean
-  usedAt?: Date | string | null
-  expiresAt: Date | string
-  lastValidAfter: Date | string
-  requestMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  createdAt?: Date | string
-  UsageLog?: Prisma.UsageLogUncheckedCreateNestedOneWithoutTokenInput
-}
-
-export type TokenCreateOrConnectWithoutPaymentInput = {
-  where: Prisma.TokenWhereUniqueInput
-  create: Prisma.XOR<Prisma.TokenCreateWithoutPaymentInput, Prisma.TokenUncheckedCreateWithoutPaymentInput>
-}
-
-export type TokenCreateManyPaymentInputEnvelope = {
-  data: Prisma.TokenCreateManyPaymentInput | Prisma.TokenCreateManyPaymentInput[]
-  skipDuplicates?: boolean
-}
-
-export type TokenUpsertWithWhereUniqueWithoutPaymentInput = {
-  where: Prisma.TokenWhereUniqueInput
-  update: Prisma.XOR<Prisma.TokenUpdateWithoutPaymentInput, Prisma.TokenUncheckedUpdateWithoutPaymentInput>
-  create: Prisma.XOR<Prisma.TokenCreateWithoutPaymentInput, Prisma.TokenUncheckedCreateWithoutPaymentInput>
-}
-
-export type TokenUpdateWithWhereUniqueWithoutPaymentInput = {
-  where: Prisma.TokenWhereUniqueInput
-  data: Prisma.XOR<Prisma.TokenUpdateWithoutPaymentInput, Prisma.TokenUncheckedUpdateWithoutPaymentInput>
-}
-
-export type TokenUpdateManyWithWhereWithoutPaymentInput = {
-  where: Prisma.TokenScalarWhereInput
-  data: Prisma.XOR<Prisma.TokenUpdateManyMutationInput, Prisma.TokenUncheckedUpdateManyWithoutPaymentInput>
 }
 
 export type TokenCreateWithoutProviderInput = {
@@ -762,13 +637,11 @@ export type TokenCreateWithoutProviderInput = {
   requestMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   Api: Prisma.ApiCreateNestedOneWithoutTokenInput
-  Payment: Prisma.PaymentCreateNestedOneWithoutTokenInput
   UsageLog?: Prisma.UsageLogCreateNestedOneWithoutTokenInput
 }
 
 export type TokenUncheckedCreateWithoutProviderInput = {
   id: string
-  paymentId: string
   apiId: string
   developerAddress: string
   tokenHash: string
@@ -818,13 +691,11 @@ export type TokenCreateWithoutUsageLogInput = {
   requestMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   Api: Prisma.ApiCreateNestedOneWithoutTokenInput
-  Payment: Prisma.PaymentCreateNestedOneWithoutTokenInput
   Provider: Prisma.ProviderCreateNestedOneWithoutTokenInput
 }
 
 export type TokenUncheckedCreateWithoutUsageLogInput = {
   id: string
-  paymentId: string
   apiId: string
   providerId: string
   developerAddress: string
@@ -864,13 +735,11 @@ export type TokenUpdateWithoutUsageLogInput = {
   requestMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Api?: Prisma.ApiUpdateOneRequiredWithoutTokenNestedInput
-  Payment?: Prisma.PaymentUpdateOneRequiredWithoutTokenNestedInput
   Provider?: Prisma.ProviderUpdateOneRequiredWithoutTokenNestedInput
 }
 
 export type TokenUncheckedUpdateWithoutUsageLogInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  paymentId?: Prisma.StringFieldUpdateOperationsInput | string
   apiId?: Prisma.StringFieldUpdateOperationsInput | string
   providerId?: Prisma.StringFieldUpdateOperationsInput | string
   developerAddress?: Prisma.StringFieldUpdateOperationsInput | string
@@ -885,7 +754,6 @@ export type TokenUncheckedUpdateWithoutUsageLogInput = {
 
 export type TokenCreateManyApiInput = {
   id: string
-  paymentId: string
   providerId: string
   developerAddress: string
   tokenHash: string
@@ -907,14 +775,12 @@ export type TokenUpdateWithoutApiInput = {
   lastValidAfter?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  Payment?: Prisma.PaymentUpdateOneRequiredWithoutTokenNestedInput
   Provider?: Prisma.ProviderUpdateOneRequiredWithoutTokenNestedInput
   UsageLog?: Prisma.UsageLogUpdateOneWithoutTokenNestedInput
 }
 
 export type TokenUncheckedUpdateWithoutApiInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  paymentId?: Prisma.StringFieldUpdateOperationsInput | string
   providerId?: Prisma.StringFieldUpdateOperationsInput | string
   developerAddress?: Prisma.StringFieldUpdateOperationsInput | string
   tokenHash?: Prisma.StringFieldUpdateOperationsInput | string
@@ -929,65 +795,6 @@ export type TokenUncheckedUpdateWithoutApiInput = {
 
 export type TokenUncheckedUpdateManyWithoutApiInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  paymentId?: Prisma.StringFieldUpdateOperationsInput | string
-  providerId?: Prisma.StringFieldUpdateOperationsInput | string
-  developerAddress?: Prisma.StringFieldUpdateOperationsInput | string
-  tokenHash?: Prisma.StringFieldUpdateOperationsInput | string
-  isUsed?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  usedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastValidAfter?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  requestMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type TokenCreateManyPaymentInput = {
-  id: string
-  apiId: string
-  providerId: string
-  developerAddress: string
-  tokenHash: string
-  isUsed?: boolean
-  usedAt?: Date | string | null
-  expiresAt: Date | string
-  lastValidAfter: Date | string
-  requestMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  createdAt?: Date | string
-}
-
-export type TokenUpdateWithoutPaymentInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  developerAddress?: Prisma.StringFieldUpdateOperationsInput | string
-  tokenHash?: Prisma.StringFieldUpdateOperationsInput | string
-  isUsed?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  usedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastValidAfter?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  requestMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  Api?: Prisma.ApiUpdateOneRequiredWithoutTokenNestedInput
-  Provider?: Prisma.ProviderUpdateOneRequiredWithoutTokenNestedInput
-  UsageLog?: Prisma.UsageLogUpdateOneWithoutTokenNestedInput
-}
-
-export type TokenUncheckedUpdateWithoutPaymentInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  apiId?: Prisma.StringFieldUpdateOperationsInput | string
-  providerId?: Prisma.StringFieldUpdateOperationsInput | string
-  developerAddress?: Prisma.StringFieldUpdateOperationsInput | string
-  tokenHash?: Prisma.StringFieldUpdateOperationsInput | string
-  isUsed?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  usedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastValidAfter?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  requestMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  UsageLog?: Prisma.UsageLogUncheckedUpdateOneWithoutTokenNestedInput
-}
-
-export type TokenUncheckedUpdateManyWithoutPaymentInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  apiId?: Prisma.StringFieldUpdateOperationsInput | string
   providerId?: Prisma.StringFieldUpdateOperationsInput | string
   developerAddress?: Prisma.StringFieldUpdateOperationsInput | string
   tokenHash?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1001,7 +808,6 @@ export type TokenUncheckedUpdateManyWithoutPaymentInput = {
 
 export type TokenCreateManyProviderInput = {
   id: string
-  paymentId: string
   apiId: string
   developerAddress: string
   tokenHash: string
@@ -1024,13 +830,11 @@ export type TokenUpdateWithoutProviderInput = {
   requestMetadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Api?: Prisma.ApiUpdateOneRequiredWithoutTokenNestedInput
-  Payment?: Prisma.PaymentUpdateOneRequiredWithoutTokenNestedInput
   UsageLog?: Prisma.UsageLogUpdateOneWithoutTokenNestedInput
 }
 
 export type TokenUncheckedUpdateWithoutProviderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  paymentId?: Prisma.StringFieldUpdateOperationsInput | string
   apiId?: Prisma.StringFieldUpdateOperationsInput | string
   developerAddress?: Prisma.StringFieldUpdateOperationsInput | string
   tokenHash?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1045,7 +849,6 @@ export type TokenUncheckedUpdateWithoutProviderInput = {
 
 export type TokenUncheckedUpdateManyWithoutProviderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  paymentId?: Prisma.StringFieldUpdateOperationsInput | string
   apiId?: Prisma.StringFieldUpdateOperationsInput | string
   developerAddress?: Prisma.StringFieldUpdateOperationsInput | string
   tokenHash?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1061,7 +864,6 @@ export type TokenUncheckedUpdateManyWithoutProviderInput = {
 
 export type TokenSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  paymentId?: boolean
   apiId?: boolean
   providerId?: boolean
   developerAddress?: boolean
@@ -1073,14 +875,12 @@ export type TokenSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   requestMetadata?: boolean
   createdAt?: boolean
   Api?: boolean | Prisma.ApiDefaultArgs<ExtArgs>
-  Payment?: boolean | Prisma.PaymentDefaultArgs<ExtArgs>
   Provider?: boolean | Prisma.ProviderDefaultArgs<ExtArgs>
   UsageLog?: boolean | Prisma.Token$UsageLogArgs<ExtArgs>
 }, ExtArgs["result"]["token"]>
 
 export type TokenSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  paymentId?: boolean
   apiId?: boolean
   providerId?: boolean
   developerAddress?: boolean
@@ -1092,13 +892,11 @@ export type TokenSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   requestMetadata?: boolean
   createdAt?: boolean
   Api?: boolean | Prisma.ApiDefaultArgs<ExtArgs>
-  Payment?: boolean | Prisma.PaymentDefaultArgs<ExtArgs>
   Provider?: boolean | Prisma.ProviderDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["token"]>
 
 export type TokenSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  paymentId?: boolean
   apiId?: boolean
   providerId?: boolean
   developerAddress?: boolean
@@ -1110,13 +908,11 @@ export type TokenSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   requestMetadata?: boolean
   createdAt?: boolean
   Api?: boolean | Prisma.ApiDefaultArgs<ExtArgs>
-  Payment?: boolean | Prisma.PaymentDefaultArgs<ExtArgs>
   Provider?: boolean | Prisma.ProviderDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["token"]>
 
 export type TokenSelectScalar = {
   id?: boolean
-  paymentId?: boolean
   apiId?: boolean
   providerId?: boolean
   developerAddress?: boolean
@@ -1129,21 +925,18 @@ export type TokenSelectScalar = {
   createdAt?: boolean
 }
 
-export type TokenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "paymentId" | "apiId" | "providerId" | "developerAddress" | "tokenHash" | "isUsed" | "usedAt" | "expiresAt" | "lastValidAfter" | "requestMetadata" | "createdAt", ExtArgs["result"]["token"]>
+export type TokenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "apiId" | "providerId" | "developerAddress" | "tokenHash" | "isUsed" | "usedAt" | "expiresAt" | "lastValidAfter" | "requestMetadata" | "createdAt", ExtArgs["result"]["token"]>
 export type TokenInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   Api?: boolean | Prisma.ApiDefaultArgs<ExtArgs>
-  Payment?: boolean | Prisma.PaymentDefaultArgs<ExtArgs>
   Provider?: boolean | Prisma.ProviderDefaultArgs<ExtArgs>
   UsageLog?: boolean | Prisma.Token$UsageLogArgs<ExtArgs>
 }
 export type TokenIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   Api?: boolean | Prisma.ApiDefaultArgs<ExtArgs>
-  Payment?: boolean | Prisma.PaymentDefaultArgs<ExtArgs>
   Provider?: boolean | Prisma.ProviderDefaultArgs<ExtArgs>
 }
 export type TokenIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   Api?: boolean | Prisma.ApiDefaultArgs<ExtArgs>
-  Payment?: boolean | Prisma.PaymentDefaultArgs<ExtArgs>
   Provider?: boolean | Prisma.ProviderDefaultArgs<ExtArgs>
 }
 
@@ -1151,13 +944,11 @@ export type $TokenPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   name: "Token"
   objects: {
     Api: Prisma.$ApiPayload<ExtArgs>
-    Payment: Prisma.$PaymentPayload<ExtArgs>
     Provider: Prisma.$ProviderPayload<ExtArgs>
     UsageLog: Prisma.$UsageLogPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    paymentId: string
     apiId: string
     providerId: string
     developerAddress: string
@@ -1563,7 +1354,6 @@ readonly fields: TokenFieldRefs;
 export interface Prisma__TokenClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   Api<T extends Prisma.ApiDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ApiDefaultArgs<ExtArgs>>): Prisma.Prisma__ApiClient<runtime.Types.Result.GetResult<Prisma.$ApiPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  Payment<T extends Prisma.PaymentDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentDefaultArgs<ExtArgs>>): Prisma.Prisma__PaymentClient<runtime.Types.Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   Provider<T extends Prisma.ProviderDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProviderDefaultArgs<ExtArgs>>): Prisma.Prisma__ProviderClient<runtime.Types.Result.GetResult<Prisma.$ProviderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   UsageLog<T extends Prisma.Token$UsageLogArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Token$UsageLogArgs<ExtArgs>>): Prisma.Prisma__UsageLogClient<runtime.Types.Result.GetResult<Prisma.$UsageLogPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
@@ -1596,7 +1386,6 @@ export interface Prisma__TokenClient<T, Null = never, ExtArgs extends runtime.Ty
  */
 export interface TokenFieldRefs {
   readonly id: Prisma.FieldRef<"Token", 'String'>
-  readonly paymentId: Prisma.FieldRef<"Token", 'String'>
   readonly apiId: Prisma.FieldRef<"Token", 'String'>
   readonly providerId: Prisma.FieldRef<"Token", 'String'>
   readonly developerAddress: Prisma.FieldRef<"Token", 'String'>
