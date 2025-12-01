@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, ScrollView, RefreshControl } from 'react-native';
+import { BarChart } from 'react-native-gifted-charts';
 import { apiGet } from '../api/client';
 
 export default function ReportScreen() {
@@ -80,6 +81,39 @@ export default function ReportScreen() {
             />
           </View>
 
+          {report?.purchasesByApi && report.purchasesByApi.length > 0 && (
+            <View style={styles.chartContainer}>
+              <Text style={styles.subtitle}>Sales Overview</Text>
+              <View style={styles.chartWrapper}>
+                <BarChart
+                  data={report.purchasesByApi.map((item: any) => ({
+                    value: item.count,
+                    label: item.apiName.length > 10 ? item.apiName.substring(0, 10) + '...' : item.apiName,
+                    frontColor: '#4f46e5',
+                    topLabelComponent: () => (
+                      <Text style={{ color: '#333', fontSize: 10, marginBottom: 4 }}>{item.count}</Text>
+                    ),
+                  }))}
+                  barWidth={32}
+                  noOfSections={4}
+                  barBorderRadius={6}
+                  frontColor="#4f46e5"
+                  yAxisThickness={0}
+                  xAxisThickness={0}
+                  hideRules
+                  isAnimated
+                  animationDuration={300}
+                  width={300}
+                  height={200}
+                  spacing={20}
+                  initialSpacing={10}
+                  labelWidth={40}
+                  xAxisLabelTextStyle={{ color: '#666', fontSize: 10 }}
+                />
+              </View>
+            </View>
+          )}
+
           <Text style={[styles.subtitle, { marginTop: 32 }]}>Purchases per API</Text>
           {report?.purchasesByApi && report.purchasesByApi.length > 0 ? (
             <View style={styles.list}>
@@ -124,4 +158,17 @@ const styles = StyleSheet.create({
   itemName: { fontSize: 16, color: '#333', fontWeight: '500' },
   itemValue: { fontSize: 16, color: '#000', fontWeight: '700' },
   emptyText: { textAlign: 'center', color: '#888', marginTop: 10, fontSize: 14 },
+  chartContainer: { marginTop: 24 },
+  chartWrapper: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
 });
