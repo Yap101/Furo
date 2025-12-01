@@ -81,10 +81,10 @@ export default function ReportScreen() {
             />
           </View>
 
-          {report?.purchasesByApi && report.purchasesByApi.length > 0 && (
-            <View style={styles.chartContainer}>
-              <Text style={styles.subtitle}>Sales Overview</Text>
-              <View style={styles.chartWrapper}>
+          <View style={styles.chartContainer}>
+            <Text style={styles.subtitle}>Sales Overview</Text>
+            <View style={styles.chartWrapper}>
+              {report?.purchasesByApi && report.purchasesByApi.length > 0 ? (
                 <BarChart
                   data={report.purchasesByApi.map((item: any) => ({
                     value: item.count,
@@ -110,9 +110,14 @@ export default function ReportScreen() {
                   labelWidth={40}
                   xAxisLabelTextStyle={{ color: '#666', fontSize: 10 }}
                 />
-              </View>
+              ) : (
+                <View style={{ height: 200, justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+                  <Text style={{ color: '#666', fontSize: 16 }}>No sales data available</Text>
+                  <Text style={{ fontSize: 32, fontWeight: '700', color: '#333', marginTop: 8 }}>0 Sales</Text>
+                </View>
+              )}
             </View>
-          )}
+          </View>
 
           <Text style={[styles.subtitle, { marginTop: 32 }]}>Purchases per API</Text>
           {report?.purchasesByApi && report.purchasesByApi.length > 0 ? (
