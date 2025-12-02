@@ -1,14 +1,197 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
+  output   = "../mobile/lib/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+model Api {
+  id                  String         @id
+  providerId          String
+  name                String
+  description         String
+  category            String
+  endpoint            String
+  publicPath          String         @unique
+  method              String         @default("GET")
+  pricePerCall        String
+  currency            String         @default("ETH")
+  isActive            Boolean        @default(true)
+  totalCalls          Int            @default(0)
+  totalRevenue        String         @default("0")
+  averageResponseTime Int            @default(0)
+  uptime              Float          @default(100.0)
+  documentation       Json?
+  headers             Json?
+  queryParams         Json?
+  internalEndpoint    String?
+  internalAuth        Json?
+  relayConfiguration  Json?
+  isDirectRelay       Boolean        @default(false)
+  fallbackEndpoint    String?
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime
+  Provider            Provider       @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  Favorite            Favorite[]
+  PurchasedApi        PurchasedApi[]
+  Review              Review[]
+  Token               Token[]
+  UsageLog            UsageLog[]
+
+  @@index([category])
+  @@index([isActive])
+  @@index([pricePerCall])
+  @@index([providerId])
+  @@index([totalCalls])
+  @@index([isDirectRelay])
+  @@index([publicPath])
+}
+
+model ApiKey {
+  id          String    @id
+  providerId  String
+  name        String
+  keyHash     String    @unique
+  lastUsed    DateTime?
+  isActive    Boolean   @default(true)
+  permissions Json?
+  rateLimit   Int?
+  createdAt   DateTime  @default(now())
+  expiresAt   DateTime?
+  updatedAt   DateTime  @updatedAt
+  Provider    Provider  @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@index([isActive])
+  @@index([keyHash])
+  @@index([providerId])
+  @@index([expiresAt])
+}
+
+model Favorite {
+  id        String   @id
+  userId    String
+  apiId     String
+  createdAt DateTime @default(now())
+  Api       Api      @relation(fields: [apiId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, apiId])
+  @@index([apiId])
+  @@index([userId])
+}
+
+model Provider {
+  id              String         @id
+  walletAddress   String         @unique
+  email           String?        @unique
+  name            String?
+  description     String?
+  website         String?
+  avatarUrl       String?
+  isActive        Boolean        @default(true)
+  reputationScore Float          @default(0)
+  totalEarnings   String         @default("0")
+  totalCalls      Int            @default(0)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime
+  Api             Api[]
+  ApiKey          ApiKey[]
+  PurchasedApi    PurchasedApi[]
+  Token           Token[]
+
+  @@index([isActive])
+  @@index([reputationScore])
+  @@index([walletAddress])
+}
+
+model Review {
+  id              String   @id
+  apiId           String
+  reviewerAddress String
+  rating          Int
+  comment         String?
+  isVerified      Boolean  @default(false)
+  helpfulCount    Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime
+  Api             Api      @relation(fields: [apiId], references: [id], onDelete: Cascade)
+
+  @@unique([apiId, reviewerAddress])
+  @@index([apiId])
+  @@index([rating])
+  @@index([reviewerAddress])
+}
+
+model Token {
+  id               String    @id
+  apiId            String
+  providerId       String
+  developerAddress String
+  tokenHash        String    @unique
+  isUsed           Boolean   @default(false)
+  usedAt           DateTime?
+  expiresAt        DateTime
+  lastValidAfter   DateTime
+  requestMetadata  Json?
+  createdAt        DateTime  @default(now())
+  Api              Api       @relation(fields: [apiId], references: [id], onDelete: Cascade)
+  Provider         Provider  @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  UsageLog         UsageLog?
+
+  @@index([apiId])
+  @@index([developerAddress])
+  @@index([expiresAt])
+  @@index([isUsed])
+  @@index([providerId])
+  @@index([tokenHash])
+}
+
+model PurchasedApi {
+  id               String   @id
+  apiId            String
+  developerAddress String
+  providerId       String
+  transactionHash  String
+  paymentAmount    String
+  status           String   @default("ACTIVE")
+  expiresAt        DateTime
+  createdAt        DateTime @default(now())
+  Api              Api      @relation(fields: [apiId], references: [id], onDelete: Cascade)
+  Provider         Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@index([developerAddress])
+  @@index([apiId])
+  @@index([providerId])
+  @@index([status])
+  @@index([expiresAt])
+  @@index([transactionHash])
+}
+
+model UsageLog {
+  id               String   @id
+  tokenId          String   @unique
+  apiId            String
+  providerId       String
+  developerAddress String
+  requestHeaders   Json?
+  requestParams    Json?
+  requestBody      String?
+  responseStatus   Int
+  responseTime     Int
+  responseSize     Int
+  errorMessage     String?
+  success          Boolean  @default(false)
+  ipAddress        String?
+  userAgent        String?
+  createdAt        DateTime @default(now())
+  Api              Api      @relation(fields: [apiId], references: [id], onDelete: Cascade)
+  Token            Token    @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@index([apiId])
+  @@index([createdAt])
+  @@index([developerAddress])
+  @@index([providerId])
+  @@index([success])
+  @@index([tokenId])
 }
