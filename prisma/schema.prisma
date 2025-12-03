@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../mobile/lib/generated/prisma"
 }
 
 datasource db {

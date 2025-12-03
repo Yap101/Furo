@@ -66,7 +66,7 @@ export type UsageLog = $Result.DefaultSelection<Prisma.$UsageLogPayload>
  * ```
  *
  *
- * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client).
+ * Read more in our [docs](https://pris.ly/d/client).
  */
 export class PrismaClient<
   ClientOptions extends Prisma.PrismaClientOptions = Prisma.PrismaClientOptions,
@@ -87,7 +87,7 @@ export class PrismaClient<
    * ```
    *
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client).
+   * Read more in our [docs](https://pris.ly/d/client).
    */
 
   constructor(optionsArg ?: Prisma.Subset<ClientOptions, Prisma.PrismaClientOptions>);
@@ -110,7 +110,7 @@ export class PrismaClient<
    * const result = await prisma.$executeRaw`UPDATE User SET cool = ${true} WHERE email = ${'user@email.com'};`
    * ```
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   * Read more in our [docs](https://pris.ly/d/raw-queries).
    */
   $executeRaw<T = unknown>(query: TemplateStringsArray | Prisma.Sql, ...values: any[]): Prisma.PrismaPromise<number>;
 
@@ -122,7 +122,7 @@ export class PrismaClient<
    * const result = await prisma.$executeRawUnsafe('UPDATE User SET cool = $1 WHERE email = $2 ;', true, 'user@email.com')
    * ```
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   * Read more in our [docs](https://pris.ly/d/raw-queries).
    */
   $executeRawUnsafe<T = unknown>(query: string, ...values: any[]): Prisma.PrismaPromise<number>;
 
@@ -133,7 +133,7 @@ export class PrismaClient<
    * const result = await prisma.$queryRaw`SELECT * FROM User WHERE id = ${1} OR email = ${'user@email.com'};`
    * ```
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   * Read more in our [docs](https://pris.ly/d/raw-queries).
    */
   $queryRaw<T = unknown>(query: TemplateStringsArray | Prisma.Sql, ...values: any[]): Prisma.PrismaPromise<T>;
 
@@ -145,7 +145,7 @@ export class PrismaClient<
    * const result = await prisma.$queryRawUnsafe('SELECT * FROM User WHERE id = $1 OR email = $2;', 1, 'user@email.com')
    * ```
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   * Read more in our [docs](https://pris.ly/d/raw-queries).
    */
   $queryRawUnsafe<T = unknown>(query: string, ...values: any[]): Prisma.PrismaPromise<T>;
 
@@ -300,8 +300,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 7.0.1
-   * Query Engine version: f09f2815f091dbba658cdcd2264306d88bb5bda6
+   * Prisma Client JS version: 7.1.0
+   * Query Engine version: ab635e6b9d606fa5c8fb8b1a7f909c3c3c1c98ba
    */
   export type PrismaVersion = {
     client: string
@@ -1357,7 +1357,7 @@ export namespace Prisma {
      *  { emit: 'stdout', level: 'error' }
      * 
      * ```
-     * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/logging#the-log-option).
+     * Read more in our [docs](https://pris.ly/d/logging).
      */
     log?: (LogLevel | LogDefinition)[]
     /**
@@ -1393,6 +1393,22 @@ export namespace Prisma {
      * ```
      */
     omit?: Prisma.GlobalOmitConfig
+    /**
+     * SQL commenter plugins that add metadata to SQL queries as comments.
+     * Comments follow the sqlcommenter format: https://google.github.io/sqlcommenter/
+     * 
+     * @example
+     * ```
+     * const prisma = new PrismaClient({
+     *   adapter,
+     *   comments: [
+     *     traceContext(),
+     *     queryInsights(),
+     *   ],
+     * })
+     * ```
+     */
+    comments?: runtime.SqlCommenterPlugin[]
   }
   export type GlobalOmitConfig = {
     api?: ApiOmit
@@ -1484,18 +1500,18 @@ export namespace Prisma {
 
   export type ApiCountOutputType = {
     Favorite: number
+    PurchasedApi: number
     Review: number
     Token: number
     UsageLog: number
-    PurchasedApi: number
   }
 
   export type ApiCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     Favorite?: boolean | ApiCountOutputTypeCountFavoriteArgs
+    PurchasedApi?: boolean | ApiCountOutputTypeCountPurchasedApiArgs
     Review?: boolean | ApiCountOutputTypeCountReviewArgs
     Token?: boolean | ApiCountOutputTypeCountTokenArgs
     UsageLog?: boolean | ApiCountOutputTypeCountUsageLogArgs
-    PurchasedApi?: boolean | ApiCountOutputTypeCountPurchasedApiArgs
   }
 
   // Custom InputTypes
@@ -1519,6 +1535,13 @@ export namespace Prisma {
   /**
    * ApiCountOutputType without action
    */
+  export type ApiCountOutputTypeCountPurchasedApiArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PurchasedApiWhereInput
+  }
+
+  /**
+   * ApiCountOutputType without action
+   */
   export type ApiCountOutputTypeCountReviewArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ReviewWhereInput
   }
@@ -1537,13 +1560,6 @@ export namespace Prisma {
     where?: UsageLogWhereInput
   }
 
-  /**
-   * ApiCountOutputType without action
-   */
-  export type ApiCountOutputTypeCountPurchasedApiArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: PurchasedApiWhereInput
-  }
-
 
   /**
    * Count Type ProviderCountOutputType
@@ -1552,15 +1568,15 @@ export namespace Prisma {
   export type ProviderCountOutputType = {
     Api: number
     ApiKey: number
-    Token: number
     PurchasedApi: number
+    Token: number
   }
 
   export type ProviderCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     Api?: boolean | ProviderCountOutputTypeCountApiArgs
     ApiKey?: boolean | ProviderCountOutputTypeCountApiKeyArgs
-    Token?: boolean | ProviderCountOutputTypeCountTokenArgs
     PurchasedApi?: boolean | ProviderCountOutputTypeCountPurchasedApiArgs
+    Token?: boolean | ProviderCountOutputTypeCountTokenArgs
   }
 
   // Custom InputTypes
@@ -1591,15 +1607,15 @@ export namespace Prisma {
   /**
    * ProviderCountOutputType without action
    */
-  export type ProviderCountOutputTypeCountTokenArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: TokenWhereInput
+  export type ProviderCountOutputTypeCountPurchasedApiArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PurchasedApiWhereInput
   }
 
   /**
    * ProviderCountOutputType without action
    */
-  export type ProviderCountOutputTypeCountPurchasedApiArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: PurchasedApiWhereInput
+  export type ProviderCountOutputTypeCountTokenArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TokenWhereInput
   }
 
 
@@ -1955,10 +1971,10 @@ export namespace Prisma {
     updatedAt?: boolean
     Provider?: boolean | ProviderDefaultArgs<ExtArgs>
     Favorite?: boolean | Api$FavoriteArgs<ExtArgs>
+    PurchasedApi?: boolean | Api$PurchasedApiArgs<ExtArgs>
     Review?: boolean | Api$ReviewArgs<ExtArgs>
     Token?: boolean | Api$TokenArgs<ExtArgs>
     UsageLog?: boolean | Api$UsageLogArgs<ExtArgs>
-    PurchasedApi?: boolean | Api$PurchasedApiArgs<ExtArgs>
     _count?: boolean | ApiCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["api"]>
 
@@ -2052,10 +2068,10 @@ export namespace Prisma {
   export type ApiInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     Provider?: boolean | ProviderDefaultArgs<ExtArgs>
     Favorite?: boolean | Api$FavoriteArgs<ExtArgs>
+    PurchasedApi?: boolean | Api$PurchasedApiArgs<ExtArgs>
     Review?: boolean | Api$ReviewArgs<ExtArgs>
     Token?: boolean | Api$TokenArgs<ExtArgs>
     UsageLog?: boolean | Api$UsageLogArgs<ExtArgs>
-    PurchasedApi?: boolean | Api$PurchasedApiArgs<ExtArgs>
     _count?: boolean | ApiCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ApiIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2070,10 +2086,10 @@ export namespace Prisma {
     objects: {
       Provider: Prisma.$ProviderPayload<ExtArgs>
       Favorite: Prisma.$FavoritePayload<ExtArgs>[]
+      PurchasedApi: Prisma.$PurchasedApiPayload<ExtArgs>[]
       Review: Prisma.$ReviewPayload<ExtArgs>[]
       Token: Prisma.$TokenPayload<ExtArgs>[]
       UsageLog: Prisma.$UsageLogPayload<ExtArgs>[]
-      PurchasedApi: Prisma.$PurchasedApiPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -2497,10 +2513,10 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     Provider<T extends ProviderDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProviderDefaultArgs<ExtArgs>>): Prisma__ProviderClient<$Result.GetResult<Prisma.$ProviderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     Favorite<T extends Api$FavoriteArgs<ExtArgs> = {}>(args?: Subset<T, Api$FavoriteArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FavoritePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    PurchasedApi<T extends Api$PurchasedApiArgs<ExtArgs> = {}>(args?: Subset<T, Api$PurchasedApiArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PurchasedApiPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     Review<T extends Api$ReviewArgs<ExtArgs> = {}>(args?: Subset<T, Api$ReviewArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     Token<T extends Api$TokenArgs<ExtArgs> = {}>(args?: Subset<T, Api$TokenArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     UsageLog<T extends Api$UsageLogArgs<ExtArgs> = {}>(args?: Subset<T, Api$UsageLogArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UsageLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    PurchasedApi<T extends Api$PurchasedApiArgs<ExtArgs> = {}>(args?: Subset<T, Api$PurchasedApiArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PurchasedApiPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2975,6 +2991,30 @@ export namespace Prisma {
   }
 
   /**
+   * Api.PurchasedApi
+   */
+  export type Api$PurchasedApiArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PurchasedApi
+     */
+    select?: PurchasedApiSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PurchasedApi
+     */
+    omit?: PurchasedApiOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PurchasedApiInclude<ExtArgs> | null
+    where?: PurchasedApiWhereInput
+    orderBy?: PurchasedApiOrderByWithRelationInput | PurchasedApiOrderByWithRelationInput[]
+    cursor?: PurchasedApiWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PurchasedApiScalarFieldEnum | PurchasedApiScalarFieldEnum[]
+  }
+
+  /**
    * Api.Review
    */
   export type Api$ReviewArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3044,30 +3084,6 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: UsageLogScalarFieldEnum | UsageLogScalarFieldEnum[]
-  }
-
-  /**
-   * Api.PurchasedApi
-   */
-  export type Api$PurchasedApiArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the PurchasedApi
-     */
-    select?: PurchasedApiSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the PurchasedApi
-     */
-    omit?: PurchasedApiOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: PurchasedApiInclude<ExtArgs> | null
-    where?: PurchasedApiWhereInput
-    orderBy?: PurchasedApiOrderByWithRelationInput | PurchasedApiOrderByWithRelationInput[]
-    cursor?: PurchasedApiWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: PurchasedApiScalarFieldEnum | PurchasedApiScalarFieldEnum[]
   }
 
   /**
@@ -5568,8 +5584,8 @@ export namespace Prisma {
     updatedAt?: boolean
     Api?: boolean | Provider$ApiArgs<ExtArgs>
     ApiKey?: boolean | Provider$ApiKeyArgs<ExtArgs>
-    Token?: boolean | Provider$TokenArgs<ExtArgs>
     PurchasedApi?: boolean | Provider$PurchasedApiArgs<ExtArgs>
+    Token?: boolean | Provider$TokenArgs<ExtArgs>
     _count?: boolean | ProviderCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["provider"]>
 
@@ -5625,8 +5641,8 @@ export namespace Prisma {
   export type ProviderInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     Api?: boolean | Provider$ApiArgs<ExtArgs>
     ApiKey?: boolean | Provider$ApiKeyArgs<ExtArgs>
-    Token?: boolean | Provider$TokenArgs<ExtArgs>
     PurchasedApi?: boolean | Provider$PurchasedApiArgs<ExtArgs>
+    Token?: boolean | Provider$TokenArgs<ExtArgs>
     _count?: boolean | ProviderCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ProviderIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -5637,8 +5653,8 @@ export namespace Prisma {
     objects: {
       Api: Prisma.$ApiPayload<ExtArgs>[]
       ApiKey: Prisma.$ApiKeyPayload<ExtArgs>[]
-      Token: Prisma.$TokenPayload<ExtArgs>[]
       PurchasedApi: Prisma.$PurchasedApiPayload<ExtArgs>[]
+      Token: Prisma.$TokenPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -6050,8 +6066,8 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     Api<T extends Provider$ApiArgs<ExtArgs> = {}>(args?: Subset<T, Provider$ApiArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ApiPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     ApiKey<T extends Provider$ApiKeyArgs<ExtArgs> = {}>(args?: Subset<T, Provider$ApiKeyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ApiKeyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    Token<T extends Provider$TokenArgs<ExtArgs> = {}>(args?: Subset<T, Provider$TokenArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     PurchasedApi<T extends Provider$PurchasedApiArgs<ExtArgs> = {}>(args?: Subset<T, Provider$PurchasedApiArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PurchasedApiPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    Token<T extends Provider$TokenArgs<ExtArgs> = {}>(args?: Subset<T, Provider$TokenArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6530,30 +6546,6 @@ export namespace Prisma {
   }
 
   /**
-   * Provider.Token
-   */
-  export type Provider$TokenArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Token
-     */
-    select?: TokenSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Token
-     */
-    omit?: TokenOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: TokenInclude<ExtArgs> | null
-    where?: TokenWhereInput
-    orderBy?: TokenOrderByWithRelationInput | TokenOrderByWithRelationInput[]
-    cursor?: TokenWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: TokenScalarFieldEnum | TokenScalarFieldEnum[]
-  }
-
-  /**
    * Provider.PurchasedApi
    */
   export type Provider$PurchasedApiArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6575,6 +6567,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: PurchasedApiScalarFieldEnum | PurchasedApiScalarFieldEnum[]
+  }
+
+  /**
+   * Provider.Token
+   */
+  export type Provider$TokenArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Token
+     */
+    select?: TokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Token
+     */
+    omit?: TokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TokenInclude<ExtArgs> | null
+    where?: TokenWhereInput
+    orderBy?: TokenOrderByWithRelationInput | TokenOrderByWithRelationInput[]
+    cursor?: TokenWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TokenScalarFieldEnum | TokenScalarFieldEnum[]
   }
 
   /**
@@ -11585,10 +11601,10 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Api"> | Date | string
     Provider?: XOR<ProviderScalarRelationFilter, ProviderWhereInput>
     Favorite?: FavoriteListRelationFilter
+    PurchasedApi?: PurchasedApiListRelationFilter
     Review?: ReviewListRelationFilter
     Token?: TokenListRelationFilter
     UsageLog?: UsageLogListRelationFilter
-    PurchasedApi?: PurchasedApiListRelationFilter
   }
 
   export type ApiOrderByWithRelationInput = {
@@ -11619,10 +11635,10 @@ export namespace Prisma {
     updatedAt?: SortOrder
     Provider?: ProviderOrderByWithRelationInput
     Favorite?: FavoriteOrderByRelationAggregateInput
+    PurchasedApi?: PurchasedApiOrderByRelationAggregateInput
     Review?: ReviewOrderByRelationAggregateInput
     Token?: TokenOrderByRelationAggregateInput
     UsageLog?: UsageLogOrderByRelationAggregateInput
-    PurchasedApi?: PurchasedApiOrderByRelationAggregateInput
   }
 
   export type ApiWhereUniqueInput = Prisma.AtLeast<{
@@ -11656,10 +11672,10 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Api"> | Date | string
     Provider?: XOR<ProviderScalarRelationFilter, ProviderWhereInput>
     Favorite?: FavoriteListRelationFilter
+    PurchasedApi?: PurchasedApiListRelationFilter
     Review?: ReviewListRelationFilter
     Token?: TokenListRelationFilter
     UsageLog?: UsageLogListRelationFilter
-    PurchasedApi?: PurchasedApiListRelationFilter
   }, "id" | "publicPath">
 
   export type ApiOrderByWithAggregationInput = {
@@ -11883,8 +11899,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Provider"> | Date | string
     Api?: ApiListRelationFilter
     ApiKey?: ApiKeyListRelationFilter
-    Token?: TokenListRelationFilter
     PurchasedApi?: PurchasedApiListRelationFilter
+    Token?: TokenListRelationFilter
   }
 
   export type ProviderOrderByWithRelationInput = {
@@ -11903,8 +11919,8 @@ export namespace Prisma {
     updatedAt?: SortOrder
     Api?: ApiOrderByRelationAggregateInput
     ApiKey?: ApiKeyOrderByRelationAggregateInput
-    Token?: TokenOrderByRelationAggregateInput
     PurchasedApi?: PurchasedApiOrderByRelationAggregateInput
+    Token?: TokenOrderByRelationAggregateInput
   }
 
   export type ProviderWhereUniqueInput = Prisma.AtLeast<{
@@ -11926,8 +11942,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Provider"> | Date | string
     Api?: ApiListRelationFilter
     ApiKey?: ApiKeyListRelationFilter
-    Token?: TokenListRelationFilter
     PurchasedApi?: PurchasedApiListRelationFilter
+    Token?: TokenListRelationFilter
   }, "id" | "walletAddress" | "email">
 
   export type ProviderOrderByWithAggregationInput = {
@@ -12359,10 +12375,10 @@ export namespace Prisma {
     updatedAt: Date | string
     Provider: ProviderCreateNestedOneWithoutApiInput
     Favorite?: FavoriteCreateNestedManyWithoutApiInput
+    PurchasedApi?: PurchasedApiCreateNestedManyWithoutApiInput
     Review?: ReviewCreateNestedManyWithoutApiInput
     Token?: TokenCreateNestedManyWithoutApiInput
     UsageLog?: UsageLogCreateNestedManyWithoutApiInput
-    PurchasedApi?: PurchasedApiCreateNestedManyWithoutApiInput
   }
 
   export type ApiUncheckedCreateInput = {
@@ -12392,10 +12408,10 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt: Date | string
     Favorite?: FavoriteUncheckedCreateNestedManyWithoutApiInput
+    PurchasedApi?: PurchasedApiUncheckedCreateNestedManyWithoutApiInput
     Review?: ReviewUncheckedCreateNestedManyWithoutApiInput
     Token?: TokenUncheckedCreateNestedManyWithoutApiInput
     UsageLog?: UsageLogUncheckedCreateNestedManyWithoutApiInput
-    PurchasedApi?: PurchasedApiUncheckedCreateNestedManyWithoutApiInput
   }
 
   export type ApiUpdateInput = {
@@ -12425,10 +12441,10 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     Provider?: ProviderUpdateOneRequiredWithoutApiNestedInput
     Favorite?: FavoriteUpdateManyWithoutApiNestedInput
+    PurchasedApi?: PurchasedApiUpdateManyWithoutApiNestedInput
     Review?: ReviewUpdateManyWithoutApiNestedInput
     Token?: TokenUpdateManyWithoutApiNestedInput
     UsageLog?: UsageLogUpdateManyWithoutApiNestedInput
-    PurchasedApi?: PurchasedApiUpdateManyWithoutApiNestedInput
   }
 
   export type ApiUncheckedUpdateInput = {
@@ -12458,10 +12474,10 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     Favorite?: FavoriteUncheckedUpdateManyWithoutApiNestedInput
+    PurchasedApi?: PurchasedApiUncheckedUpdateManyWithoutApiNestedInput
     Review?: ReviewUncheckedUpdateManyWithoutApiNestedInput
     Token?: TokenUncheckedUpdateManyWithoutApiNestedInput
     UsageLog?: UsageLogUncheckedUpdateManyWithoutApiNestedInput
-    PurchasedApi?: PurchasedApiUncheckedUpdateManyWithoutApiNestedInput
   }
 
   export type ApiCreateManyInput = {
@@ -12708,8 +12724,8 @@ export namespace Prisma {
     updatedAt: Date | string
     Api?: ApiCreateNestedManyWithoutProviderInput
     ApiKey?: ApiKeyCreateNestedManyWithoutProviderInput
-    Token?: TokenCreateNestedManyWithoutProviderInput
     PurchasedApi?: PurchasedApiCreateNestedManyWithoutProviderInput
+    Token?: TokenCreateNestedManyWithoutProviderInput
   }
 
   export type ProviderUncheckedCreateInput = {
@@ -12728,8 +12744,8 @@ export namespace Prisma {
     updatedAt: Date | string
     Api?: ApiUncheckedCreateNestedManyWithoutProviderInput
     ApiKey?: ApiKeyUncheckedCreateNestedManyWithoutProviderInput
-    Token?: TokenUncheckedCreateNestedManyWithoutProviderInput
     PurchasedApi?: PurchasedApiUncheckedCreateNestedManyWithoutProviderInput
+    Token?: TokenUncheckedCreateNestedManyWithoutProviderInput
   }
 
   export type ProviderUpdateInput = {
@@ -12748,8 +12764,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     Api?: ApiUpdateManyWithoutProviderNestedInput
     ApiKey?: ApiKeyUpdateManyWithoutProviderNestedInput
-    Token?: TokenUpdateManyWithoutProviderNestedInput
     PurchasedApi?: PurchasedApiUpdateManyWithoutProviderNestedInput
+    Token?: TokenUpdateManyWithoutProviderNestedInput
   }
 
   export type ProviderUncheckedUpdateInput = {
@@ -12768,8 +12784,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     Api?: ApiUncheckedUpdateManyWithoutProviderNestedInput
     ApiKey?: ApiKeyUncheckedUpdateManyWithoutProviderNestedInput
-    Token?: TokenUncheckedUpdateManyWithoutProviderNestedInput
     PurchasedApi?: PurchasedApiUncheckedUpdateManyWithoutProviderNestedInput
+    Token?: TokenUncheckedUpdateManyWithoutProviderNestedInput
   }
 
   export type ProviderCreateManyInput = {
@@ -13318,6 +13334,12 @@ export namespace Prisma {
     none?: FavoriteWhereInput
   }
 
+  export type PurchasedApiListRelationFilter = {
+    every?: PurchasedApiWhereInput
+    some?: PurchasedApiWhereInput
+    none?: PurchasedApiWhereInput
+  }
+
   export type ReviewListRelationFilter = {
     every?: ReviewWhereInput
     some?: ReviewWhereInput
@@ -13336,18 +13358,16 @@ export namespace Prisma {
     none?: UsageLogWhereInput
   }
 
-  export type PurchasedApiListRelationFilter = {
-    every?: PurchasedApiWhereInput
-    some?: PurchasedApiWhereInput
-    none?: PurchasedApiWhereInput
-  }
-
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
   }
 
   export type FavoriteOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type PurchasedApiOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -13360,10 +13380,6 @@ export namespace Prisma {
   }
 
   export type UsageLogOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type PurchasedApiOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -13993,6 +14009,13 @@ export namespace Prisma {
     connect?: FavoriteWhereUniqueInput | FavoriteWhereUniqueInput[]
   }
 
+  export type PurchasedApiCreateNestedManyWithoutApiInput = {
+    create?: XOR<PurchasedApiCreateWithoutApiInput, PurchasedApiUncheckedCreateWithoutApiInput> | PurchasedApiCreateWithoutApiInput[] | PurchasedApiUncheckedCreateWithoutApiInput[]
+    connectOrCreate?: PurchasedApiCreateOrConnectWithoutApiInput | PurchasedApiCreateOrConnectWithoutApiInput[]
+    createMany?: PurchasedApiCreateManyApiInputEnvelope
+    connect?: PurchasedApiWhereUniqueInput | PurchasedApiWhereUniqueInput[]
+  }
+
   export type ReviewCreateNestedManyWithoutApiInput = {
     create?: XOR<ReviewCreateWithoutApiInput, ReviewUncheckedCreateWithoutApiInput> | ReviewCreateWithoutApiInput[] | ReviewUncheckedCreateWithoutApiInput[]
     connectOrCreate?: ReviewCreateOrConnectWithoutApiInput | ReviewCreateOrConnectWithoutApiInput[]
@@ -14014,18 +14037,18 @@ export namespace Prisma {
     connect?: UsageLogWhereUniqueInput | UsageLogWhereUniqueInput[]
   }
 
-  export type PurchasedApiCreateNestedManyWithoutApiInput = {
-    create?: XOR<PurchasedApiCreateWithoutApiInput, PurchasedApiUncheckedCreateWithoutApiInput> | PurchasedApiCreateWithoutApiInput[] | PurchasedApiUncheckedCreateWithoutApiInput[]
-    connectOrCreate?: PurchasedApiCreateOrConnectWithoutApiInput | PurchasedApiCreateOrConnectWithoutApiInput[]
-    createMany?: PurchasedApiCreateManyApiInputEnvelope
-    connect?: PurchasedApiWhereUniqueInput | PurchasedApiWhereUniqueInput[]
-  }
-
   export type FavoriteUncheckedCreateNestedManyWithoutApiInput = {
     create?: XOR<FavoriteCreateWithoutApiInput, FavoriteUncheckedCreateWithoutApiInput> | FavoriteCreateWithoutApiInput[] | FavoriteUncheckedCreateWithoutApiInput[]
     connectOrCreate?: FavoriteCreateOrConnectWithoutApiInput | FavoriteCreateOrConnectWithoutApiInput[]
     createMany?: FavoriteCreateManyApiInputEnvelope
     connect?: FavoriteWhereUniqueInput | FavoriteWhereUniqueInput[]
+  }
+
+  export type PurchasedApiUncheckedCreateNestedManyWithoutApiInput = {
+    create?: XOR<PurchasedApiCreateWithoutApiInput, PurchasedApiUncheckedCreateWithoutApiInput> | PurchasedApiCreateWithoutApiInput[] | PurchasedApiUncheckedCreateWithoutApiInput[]
+    connectOrCreate?: PurchasedApiCreateOrConnectWithoutApiInput | PurchasedApiCreateOrConnectWithoutApiInput[]
+    createMany?: PurchasedApiCreateManyApiInputEnvelope
+    connect?: PurchasedApiWhereUniqueInput | PurchasedApiWhereUniqueInput[]
   }
 
   export type ReviewUncheckedCreateNestedManyWithoutApiInput = {
@@ -14047,13 +14070,6 @@ export namespace Prisma {
     connectOrCreate?: UsageLogCreateOrConnectWithoutApiInput | UsageLogCreateOrConnectWithoutApiInput[]
     createMany?: UsageLogCreateManyApiInputEnvelope
     connect?: UsageLogWhereUniqueInput | UsageLogWhereUniqueInput[]
-  }
-
-  export type PurchasedApiUncheckedCreateNestedManyWithoutApiInput = {
-    create?: XOR<PurchasedApiCreateWithoutApiInput, PurchasedApiUncheckedCreateWithoutApiInput> | PurchasedApiCreateWithoutApiInput[] | PurchasedApiUncheckedCreateWithoutApiInput[]
-    connectOrCreate?: PurchasedApiCreateOrConnectWithoutApiInput | PurchasedApiCreateOrConnectWithoutApiInput[]
-    createMany?: PurchasedApiCreateManyApiInputEnvelope
-    connect?: PurchasedApiWhereUniqueInput | PurchasedApiWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -14110,6 +14126,20 @@ export namespace Prisma {
     deleteMany?: FavoriteScalarWhereInput | FavoriteScalarWhereInput[]
   }
 
+  export type PurchasedApiUpdateManyWithoutApiNestedInput = {
+    create?: XOR<PurchasedApiCreateWithoutApiInput, PurchasedApiUncheckedCreateWithoutApiInput> | PurchasedApiCreateWithoutApiInput[] | PurchasedApiUncheckedCreateWithoutApiInput[]
+    connectOrCreate?: PurchasedApiCreateOrConnectWithoutApiInput | PurchasedApiCreateOrConnectWithoutApiInput[]
+    upsert?: PurchasedApiUpsertWithWhereUniqueWithoutApiInput | PurchasedApiUpsertWithWhereUniqueWithoutApiInput[]
+    createMany?: PurchasedApiCreateManyApiInputEnvelope
+    set?: PurchasedApiWhereUniqueInput | PurchasedApiWhereUniqueInput[]
+    disconnect?: PurchasedApiWhereUniqueInput | PurchasedApiWhereUniqueInput[]
+    delete?: PurchasedApiWhereUniqueInput | PurchasedApiWhereUniqueInput[]
+    connect?: PurchasedApiWhereUniqueInput | PurchasedApiWhereUniqueInput[]
+    update?: PurchasedApiUpdateWithWhereUniqueWithoutApiInput | PurchasedApiUpdateWithWhereUniqueWithoutApiInput[]
+    updateMany?: PurchasedApiUpdateManyWithWhereWithoutApiInput | PurchasedApiUpdateManyWithWhereWithoutApiInput[]
+    deleteMany?: PurchasedApiScalarWhereInput | PurchasedApiScalarWhereInput[]
+  }
+
   export type ReviewUpdateManyWithoutApiNestedInput = {
     create?: XOR<ReviewCreateWithoutApiInput, ReviewUncheckedCreateWithoutApiInput> | ReviewCreateWithoutApiInput[] | ReviewUncheckedCreateWithoutApiInput[]
     connectOrCreate?: ReviewCreateOrConnectWithoutApiInput | ReviewCreateOrConnectWithoutApiInput[]
@@ -14152,20 +14182,6 @@ export namespace Prisma {
     deleteMany?: UsageLogScalarWhereInput | UsageLogScalarWhereInput[]
   }
 
-  export type PurchasedApiUpdateManyWithoutApiNestedInput = {
-    create?: XOR<PurchasedApiCreateWithoutApiInput, PurchasedApiUncheckedCreateWithoutApiInput> | PurchasedApiCreateWithoutApiInput[] | PurchasedApiUncheckedCreateWithoutApiInput[]
-    connectOrCreate?: PurchasedApiCreateOrConnectWithoutApiInput | PurchasedApiCreateOrConnectWithoutApiInput[]
-    upsert?: PurchasedApiUpsertWithWhereUniqueWithoutApiInput | PurchasedApiUpsertWithWhereUniqueWithoutApiInput[]
-    createMany?: PurchasedApiCreateManyApiInputEnvelope
-    set?: PurchasedApiWhereUniqueInput | PurchasedApiWhereUniqueInput[]
-    disconnect?: PurchasedApiWhereUniqueInput | PurchasedApiWhereUniqueInput[]
-    delete?: PurchasedApiWhereUniqueInput | PurchasedApiWhereUniqueInput[]
-    connect?: PurchasedApiWhereUniqueInput | PurchasedApiWhereUniqueInput[]
-    update?: PurchasedApiUpdateWithWhereUniqueWithoutApiInput | PurchasedApiUpdateWithWhereUniqueWithoutApiInput[]
-    updateMany?: PurchasedApiUpdateManyWithWhereWithoutApiInput | PurchasedApiUpdateManyWithWhereWithoutApiInput[]
-    deleteMany?: PurchasedApiScalarWhereInput | PurchasedApiScalarWhereInput[]
-  }
-
   export type FavoriteUncheckedUpdateManyWithoutApiNestedInput = {
     create?: XOR<FavoriteCreateWithoutApiInput, FavoriteUncheckedCreateWithoutApiInput> | FavoriteCreateWithoutApiInput[] | FavoriteUncheckedCreateWithoutApiInput[]
     connectOrCreate?: FavoriteCreateOrConnectWithoutApiInput | FavoriteCreateOrConnectWithoutApiInput[]
@@ -14178,6 +14194,20 @@ export namespace Prisma {
     update?: FavoriteUpdateWithWhereUniqueWithoutApiInput | FavoriteUpdateWithWhereUniqueWithoutApiInput[]
     updateMany?: FavoriteUpdateManyWithWhereWithoutApiInput | FavoriteUpdateManyWithWhereWithoutApiInput[]
     deleteMany?: FavoriteScalarWhereInput | FavoriteScalarWhereInput[]
+  }
+
+  export type PurchasedApiUncheckedUpdateManyWithoutApiNestedInput = {
+    create?: XOR<PurchasedApiCreateWithoutApiInput, PurchasedApiUncheckedCreateWithoutApiInput> | PurchasedApiCreateWithoutApiInput[] | PurchasedApiUncheckedCreateWithoutApiInput[]
+    connectOrCreate?: PurchasedApiCreateOrConnectWithoutApiInput | PurchasedApiCreateOrConnectWithoutApiInput[]
+    upsert?: PurchasedApiUpsertWithWhereUniqueWithoutApiInput | PurchasedApiUpsertWithWhereUniqueWithoutApiInput[]
+    createMany?: PurchasedApiCreateManyApiInputEnvelope
+    set?: PurchasedApiWhereUniqueInput | PurchasedApiWhereUniqueInput[]
+    disconnect?: PurchasedApiWhereUniqueInput | PurchasedApiWhereUniqueInput[]
+    delete?: PurchasedApiWhereUniqueInput | PurchasedApiWhereUniqueInput[]
+    connect?: PurchasedApiWhereUniqueInput | PurchasedApiWhereUniqueInput[]
+    update?: PurchasedApiUpdateWithWhereUniqueWithoutApiInput | PurchasedApiUpdateWithWhereUniqueWithoutApiInput[]
+    updateMany?: PurchasedApiUpdateManyWithWhereWithoutApiInput | PurchasedApiUpdateManyWithWhereWithoutApiInput[]
+    deleteMany?: PurchasedApiScalarWhereInput | PurchasedApiScalarWhereInput[]
   }
 
   export type ReviewUncheckedUpdateManyWithoutApiNestedInput = {
@@ -14220,20 +14250,6 @@ export namespace Prisma {
     update?: UsageLogUpdateWithWhereUniqueWithoutApiInput | UsageLogUpdateWithWhereUniqueWithoutApiInput[]
     updateMany?: UsageLogUpdateManyWithWhereWithoutApiInput | UsageLogUpdateManyWithWhereWithoutApiInput[]
     deleteMany?: UsageLogScalarWhereInput | UsageLogScalarWhereInput[]
-  }
-
-  export type PurchasedApiUncheckedUpdateManyWithoutApiNestedInput = {
-    create?: XOR<PurchasedApiCreateWithoutApiInput, PurchasedApiUncheckedCreateWithoutApiInput> | PurchasedApiCreateWithoutApiInput[] | PurchasedApiUncheckedCreateWithoutApiInput[]
-    connectOrCreate?: PurchasedApiCreateOrConnectWithoutApiInput | PurchasedApiCreateOrConnectWithoutApiInput[]
-    upsert?: PurchasedApiUpsertWithWhereUniqueWithoutApiInput | PurchasedApiUpsertWithWhereUniqueWithoutApiInput[]
-    createMany?: PurchasedApiCreateManyApiInputEnvelope
-    set?: PurchasedApiWhereUniqueInput | PurchasedApiWhereUniqueInput[]
-    disconnect?: PurchasedApiWhereUniqueInput | PurchasedApiWhereUniqueInput[]
-    delete?: PurchasedApiWhereUniqueInput | PurchasedApiWhereUniqueInput[]
-    connect?: PurchasedApiWhereUniqueInput | PurchasedApiWhereUniqueInput[]
-    update?: PurchasedApiUpdateWithWhereUniqueWithoutApiInput | PurchasedApiUpdateWithWhereUniqueWithoutApiInput[]
-    updateMany?: PurchasedApiUpdateManyWithWhereWithoutApiInput | PurchasedApiUpdateManyWithWhereWithoutApiInput[]
-    deleteMany?: PurchasedApiScalarWhereInput | PurchasedApiScalarWhereInput[]
   }
 
   export type ProviderCreateNestedOneWithoutApiKeyInput = {
@@ -14290,18 +14306,18 @@ export namespace Prisma {
     connect?: ApiKeyWhereUniqueInput | ApiKeyWhereUniqueInput[]
   }
 
-  export type TokenCreateNestedManyWithoutProviderInput = {
-    create?: XOR<TokenCreateWithoutProviderInput, TokenUncheckedCreateWithoutProviderInput> | TokenCreateWithoutProviderInput[] | TokenUncheckedCreateWithoutProviderInput[]
-    connectOrCreate?: TokenCreateOrConnectWithoutProviderInput | TokenCreateOrConnectWithoutProviderInput[]
-    createMany?: TokenCreateManyProviderInputEnvelope
-    connect?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
-  }
-
   export type PurchasedApiCreateNestedManyWithoutProviderInput = {
     create?: XOR<PurchasedApiCreateWithoutProviderInput, PurchasedApiUncheckedCreateWithoutProviderInput> | PurchasedApiCreateWithoutProviderInput[] | PurchasedApiUncheckedCreateWithoutProviderInput[]
     connectOrCreate?: PurchasedApiCreateOrConnectWithoutProviderInput | PurchasedApiCreateOrConnectWithoutProviderInput[]
     createMany?: PurchasedApiCreateManyProviderInputEnvelope
     connect?: PurchasedApiWhereUniqueInput | PurchasedApiWhereUniqueInput[]
+  }
+
+  export type TokenCreateNestedManyWithoutProviderInput = {
+    create?: XOR<TokenCreateWithoutProviderInput, TokenUncheckedCreateWithoutProviderInput> | TokenCreateWithoutProviderInput[] | TokenUncheckedCreateWithoutProviderInput[]
+    connectOrCreate?: TokenCreateOrConnectWithoutProviderInput | TokenCreateOrConnectWithoutProviderInput[]
+    createMany?: TokenCreateManyProviderInputEnvelope
+    connect?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
   }
 
   export type ApiUncheckedCreateNestedManyWithoutProviderInput = {
@@ -14318,18 +14334,18 @@ export namespace Prisma {
     connect?: ApiKeyWhereUniqueInput | ApiKeyWhereUniqueInput[]
   }
 
-  export type TokenUncheckedCreateNestedManyWithoutProviderInput = {
-    create?: XOR<TokenCreateWithoutProviderInput, TokenUncheckedCreateWithoutProviderInput> | TokenCreateWithoutProviderInput[] | TokenUncheckedCreateWithoutProviderInput[]
-    connectOrCreate?: TokenCreateOrConnectWithoutProviderInput | TokenCreateOrConnectWithoutProviderInput[]
-    createMany?: TokenCreateManyProviderInputEnvelope
-    connect?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
-  }
-
   export type PurchasedApiUncheckedCreateNestedManyWithoutProviderInput = {
     create?: XOR<PurchasedApiCreateWithoutProviderInput, PurchasedApiUncheckedCreateWithoutProviderInput> | PurchasedApiCreateWithoutProviderInput[] | PurchasedApiUncheckedCreateWithoutProviderInput[]
     connectOrCreate?: PurchasedApiCreateOrConnectWithoutProviderInput | PurchasedApiCreateOrConnectWithoutProviderInput[]
     createMany?: PurchasedApiCreateManyProviderInputEnvelope
     connect?: PurchasedApiWhereUniqueInput | PurchasedApiWhereUniqueInput[]
+  }
+
+  export type TokenUncheckedCreateNestedManyWithoutProviderInput = {
+    create?: XOR<TokenCreateWithoutProviderInput, TokenUncheckedCreateWithoutProviderInput> | TokenCreateWithoutProviderInput[] | TokenUncheckedCreateWithoutProviderInput[]
+    connectOrCreate?: TokenCreateOrConnectWithoutProviderInput | TokenCreateOrConnectWithoutProviderInput[]
+    createMany?: TokenCreateManyProviderInputEnvelope
+    connect?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
   }
 
   export type ApiUpdateManyWithoutProviderNestedInput = {
@@ -14360,20 +14376,6 @@ export namespace Prisma {
     deleteMany?: ApiKeyScalarWhereInput | ApiKeyScalarWhereInput[]
   }
 
-  export type TokenUpdateManyWithoutProviderNestedInput = {
-    create?: XOR<TokenCreateWithoutProviderInput, TokenUncheckedCreateWithoutProviderInput> | TokenCreateWithoutProviderInput[] | TokenUncheckedCreateWithoutProviderInput[]
-    connectOrCreate?: TokenCreateOrConnectWithoutProviderInput | TokenCreateOrConnectWithoutProviderInput[]
-    upsert?: TokenUpsertWithWhereUniqueWithoutProviderInput | TokenUpsertWithWhereUniqueWithoutProviderInput[]
-    createMany?: TokenCreateManyProviderInputEnvelope
-    set?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
-    disconnect?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
-    delete?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
-    connect?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
-    update?: TokenUpdateWithWhereUniqueWithoutProviderInput | TokenUpdateWithWhereUniqueWithoutProviderInput[]
-    updateMany?: TokenUpdateManyWithWhereWithoutProviderInput | TokenUpdateManyWithWhereWithoutProviderInput[]
-    deleteMany?: TokenScalarWhereInput | TokenScalarWhereInput[]
-  }
-
   export type PurchasedApiUpdateManyWithoutProviderNestedInput = {
     create?: XOR<PurchasedApiCreateWithoutProviderInput, PurchasedApiUncheckedCreateWithoutProviderInput> | PurchasedApiCreateWithoutProviderInput[] | PurchasedApiUncheckedCreateWithoutProviderInput[]
     connectOrCreate?: PurchasedApiCreateOrConnectWithoutProviderInput | PurchasedApiCreateOrConnectWithoutProviderInput[]
@@ -14386,6 +14388,20 @@ export namespace Prisma {
     update?: PurchasedApiUpdateWithWhereUniqueWithoutProviderInput | PurchasedApiUpdateWithWhereUniqueWithoutProviderInput[]
     updateMany?: PurchasedApiUpdateManyWithWhereWithoutProviderInput | PurchasedApiUpdateManyWithWhereWithoutProviderInput[]
     deleteMany?: PurchasedApiScalarWhereInput | PurchasedApiScalarWhereInput[]
+  }
+
+  export type TokenUpdateManyWithoutProviderNestedInput = {
+    create?: XOR<TokenCreateWithoutProviderInput, TokenUncheckedCreateWithoutProviderInput> | TokenCreateWithoutProviderInput[] | TokenUncheckedCreateWithoutProviderInput[]
+    connectOrCreate?: TokenCreateOrConnectWithoutProviderInput | TokenCreateOrConnectWithoutProviderInput[]
+    upsert?: TokenUpsertWithWhereUniqueWithoutProviderInput | TokenUpsertWithWhereUniqueWithoutProviderInput[]
+    createMany?: TokenCreateManyProviderInputEnvelope
+    set?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
+    disconnect?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
+    delete?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
+    connect?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
+    update?: TokenUpdateWithWhereUniqueWithoutProviderInput | TokenUpdateWithWhereUniqueWithoutProviderInput[]
+    updateMany?: TokenUpdateManyWithWhereWithoutProviderInput | TokenUpdateManyWithWhereWithoutProviderInput[]
+    deleteMany?: TokenScalarWhereInput | TokenScalarWhereInput[]
   }
 
   export type ApiUncheckedUpdateManyWithoutProviderNestedInput = {
@@ -14416,20 +14432,6 @@ export namespace Prisma {
     deleteMany?: ApiKeyScalarWhereInput | ApiKeyScalarWhereInput[]
   }
 
-  export type TokenUncheckedUpdateManyWithoutProviderNestedInput = {
-    create?: XOR<TokenCreateWithoutProviderInput, TokenUncheckedCreateWithoutProviderInput> | TokenCreateWithoutProviderInput[] | TokenUncheckedCreateWithoutProviderInput[]
-    connectOrCreate?: TokenCreateOrConnectWithoutProviderInput | TokenCreateOrConnectWithoutProviderInput[]
-    upsert?: TokenUpsertWithWhereUniqueWithoutProviderInput | TokenUpsertWithWhereUniqueWithoutProviderInput[]
-    createMany?: TokenCreateManyProviderInputEnvelope
-    set?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
-    disconnect?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
-    delete?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
-    connect?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
-    update?: TokenUpdateWithWhereUniqueWithoutProviderInput | TokenUpdateWithWhereUniqueWithoutProviderInput[]
-    updateMany?: TokenUpdateManyWithWhereWithoutProviderInput | TokenUpdateManyWithWhereWithoutProviderInput[]
-    deleteMany?: TokenScalarWhereInput | TokenScalarWhereInput[]
-  }
-
   export type PurchasedApiUncheckedUpdateManyWithoutProviderNestedInput = {
     create?: XOR<PurchasedApiCreateWithoutProviderInput, PurchasedApiUncheckedCreateWithoutProviderInput> | PurchasedApiCreateWithoutProviderInput[] | PurchasedApiUncheckedCreateWithoutProviderInput[]
     connectOrCreate?: PurchasedApiCreateOrConnectWithoutProviderInput | PurchasedApiCreateOrConnectWithoutProviderInput[]
@@ -14442,6 +14444,20 @@ export namespace Prisma {
     update?: PurchasedApiUpdateWithWhereUniqueWithoutProviderInput | PurchasedApiUpdateWithWhereUniqueWithoutProviderInput[]
     updateMany?: PurchasedApiUpdateManyWithWhereWithoutProviderInput | PurchasedApiUpdateManyWithWhereWithoutProviderInput[]
     deleteMany?: PurchasedApiScalarWhereInput | PurchasedApiScalarWhereInput[]
+  }
+
+  export type TokenUncheckedUpdateManyWithoutProviderNestedInput = {
+    create?: XOR<TokenCreateWithoutProviderInput, TokenUncheckedCreateWithoutProviderInput> | TokenCreateWithoutProviderInput[] | TokenUncheckedCreateWithoutProviderInput[]
+    connectOrCreate?: TokenCreateOrConnectWithoutProviderInput | TokenCreateOrConnectWithoutProviderInput[]
+    upsert?: TokenUpsertWithWhereUniqueWithoutProviderInput | TokenUpsertWithWhereUniqueWithoutProviderInput[]
+    createMany?: TokenCreateManyProviderInputEnvelope
+    set?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
+    disconnect?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
+    delete?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
+    connect?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
+    update?: TokenUpdateWithWhereUniqueWithoutProviderInput | TokenUpdateWithWhereUniqueWithoutProviderInput[]
+    updateMany?: TokenUpdateManyWithWhereWithoutProviderInput | TokenUpdateManyWithWhereWithoutProviderInput[]
+    deleteMany?: TokenScalarWhereInput | TokenScalarWhereInput[]
   }
 
   export type ApiCreateNestedOneWithoutReviewInput = {
@@ -14829,8 +14845,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt: Date | string
     ApiKey?: ApiKeyCreateNestedManyWithoutProviderInput
-    Token?: TokenCreateNestedManyWithoutProviderInput
     PurchasedApi?: PurchasedApiCreateNestedManyWithoutProviderInput
+    Token?: TokenCreateNestedManyWithoutProviderInput
   }
 
   export type ProviderUncheckedCreateWithoutApiInput = {
@@ -14848,8 +14864,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt: Date | string
     ApiKey?: ApiKeyUncheckedCreateNestedManyWithoutProviderInput
-    Token?: TokenUncheckedCreateNestedManyWithoutProviderInput
     PurchasedApi?: PurchasedApiUncheckedCreateNestedManyWithoutProviderInput
+    Token?: TokenUncheckedCreateNestedManyWithoutProviderInput
   }
 
   export type ProviderCreateOrConnectWithoutApiInput = {
@@ -14876,6 +14892,38 @@ export namespace Prisma {
 
   export type FavoriteCreateManyApiInputEnvelope = {
     data: FavoriteCreateManyApiInput | FavoriteCreateManyApiInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type PurchasedApiCreateWithoutApiInput = {
+    id: string
+    developerAddress: string
+    transactionHash: string
+    paymentAmount: string
+    status?: string
+    expiresAt: Date | string
+    createdAt?: Date | string
+    Provider: ProviderCreateNestedOneWithoutPurchasedApiInput
+  }
+
+  export type PurchasedApiUncheckedCreateWithoutApiInput = {
+    id: string
+    developerAddress: string
+    providerId: string
+    transactionHash: string
+    paymentAmount: string
+    status?: string
+    expiresAt: Date | string
+    createdAt?: Date | string
+  }
+
+  export type PurchasedApiCreateOrConnectWithoutApiInput = {
+    where: PurchasedApiWhereUniqueInput
+    create: XOR<PurchasedApiCreateWithoutApiInput, PurchasedApiUncheckedCreateWithoutApiInput>
+  }
+
+  export type PurchasedApiCreateManyApiInputEnvelope = {
+    data: PurchasedApiCreateManyApiInput | PurchasedApiCreateManyApiInput[]
     skipDuplicates?: boolean
   }
 
@@ -14995,38 +15043,6 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type PurchasedApiCreateWithoutApiInput = {
-    id: string
-    developerAddress: string
-    transactionHash: string
-    paymentAmount: string
-    status?: string
-    expiresAt: Date | string
-    createdAt?: Date | string
-    Provider: ProviderCreateNestedOneWithoutPurchasedApiInput
-  }
-
-  export type PurchasedApiUncheckedCreateWithoutApiInput = {
-    id: string
-    developerAddress: string
-    providerId: string
-    transactionHash: string
-    paymentAmount: string
-    status?: string
-    expiresAt: Date | string
-    createdAt?: Date | string
-  }
-
-  export type PurchasedApiCreateOrConnectWithoutApiInput = {
-    where: PurchasedApiWhereUniqueInput
-    create: XOR<PurchasedApiCreateWithoutApiInput, PurchasedApiUncheckedCreateWithoutApiInput>
-  }
-
-  export type PurchasedApiCreateManyApiInputEnvelope = {
-    data: PurchasedApiCreateManyApiInput | PurchasedApiCreateManyApiInput[]
-    skipDuplicates?: boolean
-  }
-
   export type ProviderUpsertWithoutApiInput = {
     update: XOR<ProviderUpdateWithoutApiInput, ProviderUncheckedUpdateWithoutApiInput>
     create: XOR<ProviderCreateWithoutApiInput, ProviderUncheckedCreateWithoutApiInput>
@@ -15053,8 +15069,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     ApiKey?: ApiKeyUpdateManyWithoutProviderNestedInput
-    Token?: TokenUpdateManyWithoutProviderNestedInput
     PurchasedApi?: PurchasedApiUpdateManyWithoutProviderNestedInput
+    Token?: TokenUpdateManyWithoutProviderNestedInput
   }
 
   export type ProviderUncheckedUpdateWithoutApiInput = {
@@ -15072,8 +15088,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     ApiKey?: ApiKeyUncheckedUpdateManyWithoutProviderNestedInput
-    Token?: TokenUncheckedUpdateManyWithoutProviderNestedInput
     PurchasedApi?: PurchasedApiUncheckedUpdateManyWithoutProviderNestedInput
+    Token?: TokenUncheckedUpdateManyWithoutProviderNestedInput
   }
 
   export type FavoriteUpsertWithWhereUniqueWithoutApiInput = {
@@ -15100,6 +15116,37 @@ export namespace Prisma {
     userId?: StringFilter<"Favorite"> | string
     apiId?: StringFilter<"Favorite"> | string
     createdAt?: DateTimeFilter<"Favorite"> | Date | string
+  }
+
+  export type PurchasedApiUpsertWithWhereUniqueWithoutApiInput = {
+    where: PurchasedApiWhereUniqueInput
+    update: XOR<PurchasedApiUpdateWithoutApiInput, PurchasedApiUncheckedUpdateWithoutApiInput>
+    create: XOR<PurchasedApiCreateWithoutApiInput, PurchasedApiUncheckedCreateWithoutApiInput>
+  }
+
+  export type PurchasedApiUpdateWithWhereUniqueWithoutApiInput = {
+    where: PurchasedApiWhereUniqueInput
+    data: XOR<PurchasedApiUpdateWithoutApiInput, PurchasedApiUncheckedUpdateWithoutApiInput>
+  }
+
+  export type PurchasedApiUpdateManyWithWhereWithoutApiInput = {
+    where: PurchasedApiScalarWhereInput
+    data: XOR<PurchasedApiUpdateManyMutationInput, PurchasedApiUncheckedUpdateManyWithoutApiInput>
+  }
+
+  export type PurchasedApiScalarWhereInput = {
+    AND?: PurchasedApiScalarWhereInput | PurchasedApiScalarWhereInput[]
+    OR?: PurchasedApiScalarWhereInput[]
+    NOT?: PurchasedApiScalarWhereInput | PurchasedApiScalarWhereInput[]
+    id?: StringFilter<"PurchasedApi"> | string
+    apiId?: StringFilter<"PurchasedApi"> | string
+    developerAddress?: StringFilter<"PurchasedApi"> | string
+    providerId?: StringFilter<"PurchasedApi"> | string
+    transactionHash?: StringFilter<"PurchasedApi"> | string
+    paymentAmount?: StringFilter<"PurchasedApi"> | string
+    status?: StringFilter<"PurchasedApi"> | string
+    expiresAt?: DateTimeFilter<"PurchasedApi"> | Date | string
+    createdAt?: DateTimeFilter<"PurchasedApi"> | Date | string
   }
 
   export type ReviewUpsertWithWhereUniqueWithoutApiInput = {
@@ -15204,37 +15251,6 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"UsageLog"> | Date | string
   }
 
-  export type PurchasedApiUpsertWithWhereUniqueWithoutApiInput = {
-    where: PurchasedApiWhereUniqueInput
-    update: XOR<PurchasedApiUpdateWithoutApiInput, PurchasedApiUncheckedUpdateWithoutApiInput>
-    create: XOR<PurchasedApiCreateWithoutApiInput, PurchasedApiUncheckedCreateWithoutApiInput>
-  }
-
-  export type PurchasedApiUpdateWithWhereUniqueWithoutApiInput = {
-    where: PurchasedApiWhereUniqueInput
-    data: XOR<PurchasedApiUpdateWithoutApiInput, PurchasedApiUncheckedUpdateWithoutApiInput>
-  }
-
-  export type PurchasedApiUpdateManyWithWhereWithoutApiInput = {
-    where: PurchasedApiScalarWhereInput
-    data: XOR<PurchasedApiUpdateManyMutationInput, PurchasedApiUncheckedUpdateManyWithoutApiInput>
-  }
-
-  export type PurchasedApiScalarWhereInput = {
-    AND?: PurchasedApiScalarWhereInput | PurchasedApiScalarWhereInput[]
-    OR?: PurchasedApiScalarWhereInput[]
-    NOT?: PurchasedApiScalarWhereInput | PurchasedApiScalarWhereInput[]
-    id?: StringFilter<"PurchasedApi"> | string
-    apiId?: StringFilter<"PurchasedApi"> | string
-    developerAddress?: StringFilter<"PurchasedApi"> | string
-    providerId?: StringFilter<"PurchasedApi"> | string
-    transactionHash?: StringFilter<"PurchasedApi"> | string
-    paymentAmount?: StringFilter<"PurchasedApi"> | string
-    status?: StringFilter<"PurchasedApi"> | string
-    expiresAt?: DateTimeFilter<"PurchasedApi"> | Date | string
-    createdAt?: DateTimeFilter<"PurchasedApi"> | Date | string
-  }
-
   export type ProviderCreateWithoutApiKeyInput = {
     id: string
     walletAddress: string
@@ -15250,8 +15266,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt: Date | string
     Api?: ApiCreateNestedManyWithoutProviderInput
-    Token?: TokenCreateNestedManyWithoutProviderInput
     PurchasedApi?: PurchasedApiCreateNestedManyWithoutProviderInput
+    Token?: TokenCreateNestedManyWithoutProviderInput
   }
 
   export type ProviderUncheckedCreateWithoutApiKeyInput = {
@@ -15269,8 +15285,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt: Date | string
     Api?: ApiUncheckedCreateNestedManyWithoutProviderInput
-    Token?: TokenUncheckedCreateNestedManyWithoutProviderInput
     PurchasedApi?: PurchasedApiUncheckedCreateNestedManyWithoutProviderInput
+    Token?: TokenUncheckedCreateNestedManyWithoutProviderInput
   }
 
   export type ProviderCreateOrConnectWithoutApiKeyInput = {
@@ -15304,8 +15320,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     Api?: ApiUpdateManyWithoutProviderNestedInput
-    Token?: TokenUpdateManyWithoutProviderNestedInput
     PurchasedApi?: PurchasedApiUpdateManyWithoutProviderNestedInput
+    Token?: TokenUpdateManyWithoutProviderNestedInput
   }
 
   export type ProviderUncheckedUpdateWithoutApiKeyInput = {
@@ -15323,8 +15339,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     Api?: ApiUncheckedUpdateManyWithoutProviderNestedInput
-    Token?: TokenUncheckedUpdateManyWithoutProviderNestedInput
     PurchasedApi?: PurchasedApiUncheckedUpdateManyWithoutProviderNestedInput
+    Token?: TokenUncheckedUpdateManyWithoutProviderNestedInput
   }
 
   export type ApiCreateWithoutFavoriteInput = {
@@ -15353,10 +15369,10 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt: Date | string
     Provider: ProviderCreateNestedOneWithoutApiInput
+    PurchasedApi?: PurchasedApiCreateNestedManyWithoutApiInput
     Review?: ReviewCreateNestedManyWithoutApiInput
     Token?: TokenCreateNestedManyWithoutApiInput
     UsageLog?: UsageLogCreateNestedManyWithoutApiInput
-    PurchasedApi?: PurchasedApiCreateNestedManyWithoutApiInput
   }
 
   export type ApiUncheckedCreateWithoutFavoriteInput = {
@@ -15385,10 +15401,10 @@ export namespace Prisma {
     fallbackEndpoint?: string | null
     createdAt?: Date | string
     updatedAt: Date | string
+    PurchasedApi?: PurchasedApiUncheckedCreateNestedManyWithoutApiInput
     Review?: ReviewUncheckedCreateNestedManyWithoutApiInput
     Token?: TokenUncheckedCreateNestedManyWithoutApiInput
     UsageLog?: UsageLogUncheckedCreateNestedManyWithoutApiInput
-    PurchasedApi?: PurchasedApiUncheckedCreateNestedManyWithoutApiInput
   }
 
   export type ApiCreateOrConnectWithoutFavoriteInput = {
@@ -15433,10 +15449,10 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     Provider?: ProviderUpdateOneRequiredWithoutApiNestedInput
+    PurchasedApi?: PurchasedApiUpdateManyWithoutApiNestedInput
     Review?: ReviewUpdateManyWithoutApiNestedInput
     Token?: TokenUpdateManyWithoutApiNestedInput
     UsageLog?: UsageLogUpdateManyWithoutApiNestedInput
-    PurchasedApi?: PurchasedApiUpdateManyWithoutApiNestedInput
   }
 
   export type ApiUncheckedUpdateWithoutFavoriteInput = {
@@ -15465,10 +15481,10 @@ export namespace Prisma {
     fallbackEndpoint?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    PurchasedApi?: PurchasedApiUncheckedUpdateManyWithoutApiNestedInput
     Review?: ReviewUncheckedUpdateManyWithoutApiNestedInput
     Token?: TokenUncheckedUpdateManyWithoutApiNestedInput
     UsageLog?: UsageLogUncheckedUpdateManyWithoutApiNestedInput
-    PurchasedApi?: PurchasedApiUncheckedUpdateManyWithoutApiNestedInput
   }
 
   export type ApiCreateWithoutProviderInput = {
@@ -15497,10 +15513,10 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt: Date | string
     Favorite?: FavoriteCreateNestedManyWithoutApiInput
+    PurchasedApi?: PurchasedApiCreateNestedManyWithoutApiInput
     Review?: ReviewCreateNestedManyWithoutApiInput
     Token?: TokenCreateNestedManyWithoutApiInput
     UsageLog?: UsageLogCreateNestedManyWithoutApiInput
-    PurchasedApi?: PurchasedApiCreateNestedManyWithoutApiInput
   }
 
   export type ApiUncheckedCreateWithoutProviderInput = {
@@ -15529,10 +15545,10 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt: Date | string
     Favorite?: FavoriteUncheckedCreateNestedManyWithoutApiInput
+    PurchasedApi?: PurchasedApiUncheckedCreateNestedManyWithoutApiInput
     Review?: ReviewUncheckedCreateNestedManyWithoutApiInput
     Token?: TokenUncheckedCreateNestedManyWithoutApiInput
     UsageLog?: UsageLogUncheckedCreateNestedManyWithoutApiInput
-    PurchasedApi?: PurchasedApiUncheckedCreateNestedManyWithoutApiInput
   }
 
   export type ApiCreateOrConnectWithoutProviderInput = {
@@ -15581,6 +15597,38 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type PurchasedApiCreateWithoutProviderInput = {
+    id: string
+    developerAddress: string
+    transactionHash: string
+    paymentAmount: string
+    status?: string
+    expiresAt: Date | string
+    createdAt?: Date | string
+    Api: ApiCreateNestedOneWithoutPurchasedApiInput
+  }
+
+  export type PurchasedApiUncheckedCreateWithoutProviderInput = {
+    id: string
+    apiId: string
+    developerAddress: string
+    transactionHash: string
+    paymentAmount: string
+    status?: string
+    expiresAt: Date | string
+    createdAt?: Date | string
+  }
+
+  export type PurchasedApiCreateOrConnectWithoutProviderInput = {
+    where: PurchasedApiWhereUniqueInput
+    create: XOR<PurchasedApiCreateWithoutProviderInput, PurchasedApiUncheckedCreateWithoutProviderInput>
+  }
+
+  export type PurchasedApiCreateManyProviderInputEnvelope = {
+    data: PurchasedApiCreateManyProviderInput | PurchasedApiCreateManyProviderInput[]
+    skipDuplicates?: boolean
+  }
+
   export type TokenCreateWithoutProviderInput = {
     id: string
     developerAddress: string
@@ -15616,38 +15664,6 @@ export namespace Prisma {
 
   export type TokenCreateManyProviderInputEnvelope = {
     data: TokenCreateManyProviderInput | TokenCreateManyProviderInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type PurchasedApiCreateWithoutProviderInput = {
-    id: string
-    developerAddress: string
-    transactionHash: string
-    paymentAmount: string
-    status?: string
-    expiresAt: Date | string
-    createdAt?: Date | string
-    Api: ApiCreateNestedOneWithoutPurchasedApiInput
-  }
-
-  export type PurchasedApiUncheckedCreateWithoutProviderInput = {
-    id: string
-    apiId: string
-    developerAddress: string
-    transactionHash: string
-    paymentAmount: string
-    status?: string
-    expiresAt: Date | string
-    createdAt?: Date | string
-  }
-
-  export type PurchasedApiCreateOrConnectWithoutProviderInput = {
-    where: PurchasedApiWhereUniqueInput
-    create: XOR<PurchasedApiCreateWithoutProviderInput, PurchasedApiUncheckedCreateWithoutProviderInput>
-  }
-
-  export type PurchasedApiCreateManyProviderInputEnvelope = {
-    data: PurchasedApiCreateManyProviderInput | PurchasedApiCreateManyProviderInput[]
     skipDuplicates?: boolean
   }
 
@@ -15731,22 +15747,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"ApiKey"> | Date | string
   }
 
-  export type TokenUpsertWithWhereUniqueWithoutProviderInput = {
-    where: TokenWhereUniqueInput
-    update: XOR<TokenUpdateWithoutProviderInput, TokenUncheckedUpdateWithoutProviderInput>
-    create: XOR<TokenCreateWithoutProviderInput, TokenUncheckedCreateWithoutProviderInput>
-  }
-
-  export type TokenUpdateWithWhereUniqueWithoutProviderInput = {
-    where: TokenWhereUniqueInput
-    data: XOR<TokenUpdateWithoutProviderInput, TokenUncheckedUpdateWithoutProviderInput>
-  }
-
-  export type TokenUpdateManyWithWhereWithoutProviderInput = {
-    where: TokenScalarWhereInput
-    data: XOR<TokenUpdateManyMutationInput, TokenUncheckedUpdateManyWithoutProviderInput>
-  }
-
   export type PurchasedApiUpsertWithWhereUniqueWithoutProviderInput = {
     where: PurchasedApiWhereUniqueInput
     update: XOR<PurchasedApiUpdateWithoutProviderInput, PurchasedApiUncheckedUpdateWithoutProviderInput>
@@ -15761,6 +15761,22 @@ export namespace Prisma {
   export type PurchasedApiUpdateManyWithWhereWithoutProviderInput = {
     where: PurchasedApiScalarWhereInput
     data: XOR<PurchasedApiUpdateManyMutationInput, PurchasedApiUncheckedUpdateManyWithoutProviderInput>
+  }
+
+  export type TokenUpsertWithWhereUniqueWithoutProviderInput = {
+    where: TokenWhereUniqueInput
+    update: XOR<TokenUpdateWithoutProviderInput, TokenUncheckedUpdateWithoutProviderInput>
+    create: XOR<TokenCreateWithoutProviderInput, TokenUncheckedCreateWithoutProviderInput>
+  }
+
+  export type TokenUpdateWithWhereUniqueWithoutProviderInput = {
+    where: TokenWhereUniqueInput
+    data: XOR<TokenUpdateWithoutProviderInput, TokenUncheckedUpdateWithoutProviderInput>
+  }
+
+  export type TokenUpdateManyWithWhereWithoutProviderInput = {
+    where: TokenScalarWhereInput
+    data: XOR<TokenUpdateManyMutationInput, TokenUncheckedUpdateManyWithoutProviderInput>
   }
 
   export type ApiCreateWithoutReviewInput = {
@@ -15790,9 +15806,9 @@ export namespace Prisma {
     updatedAt: Date | string
     Provider: ProviderCreateNestedOneWithoutApiInput
     Favorite?: FavoriteCreateNestedManyWithoutApiInput
+    PurchasedApi?: PurchasedApiCreateNestedManyWithoutApiInput
     Token?: TokenCreateNestedManyWithoutApiInput
     UsageLog?: UsageLogCreateNestedManyWithoutApiInput
-    PurchasedApi?: PurchasedApiCreateNestedManyWithoutApiInput
   }
 
   export type ApiUncheckedCreateWithoutReviewInput = {
@@ -15822,9 +15838,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt: Date | string
     Favorite?: FavoriteUncheckedCreateNestedManyWithoutApiInput
+    PurchasedApi?: PurchasedApiUncheckedCreateNestedManyWithoutApiInput
     Token?: TokenUncheckedCreateNestedManyWithoutApiInput
     UsageLog?: UsageLogUncheckedCreateNestedManyWithoutApiInput
-    PurchasedApi?: PurchasedApiUncheckedCreateNestedManyWithoutApiInput
   }
 
   export type ApiCreateOrConnectWithoutReviewInput = {
@@ -15870,9 +15886,9 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     Provider?: ProviderUpdateOneRequiredWithoutApiNestedInput
     Favorite?: FavoriteUpdateManyWithoutApiNestedInput
+    PurchasedApi?: PurchasedApiUpdateManyWithoutApiNestedInput
     Token?: TokenUpdateManyWithoutApiNestedInput
     UsageLog?: UsageLogUpdateManyWithoutApiNestedInput
-    PurchasedApi?: PurchasedApiUpdateManyWithoutApiNestedInput
   }
 
   export type ApiUncheckedUpdateWithoutReviewInput = {
@@ -15902,9 +15918,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     Favorite?: FavoriteUncheckedUpdateManyWithoutApiNestedInput
+    PurchasedApi?: PurchasedApiUncheckedUpdateManyWithoutApiNestedInput
     Token?: TokenUncheckedUpdateManyWithoutApiNestedInput
     UsageLog?: UsageLogUncheckedUpdateManyWithoutApiNestedInput
-    PurchasedApi?: PurchasedApiUncheckedUpdateManyWithoutApiNestedInput
   }
 
   export type ApiCreateWithoutTokenInput = {
@@ -15934,9 +15950,9 @@ export namespace Prisma {
     updatedAt: Date | string
     Provider: ProviderCreateNestedOneWithoutApiInput
     Favorite?: FavoriteCreateNestedManyWithoutApiInput
+    PurchasedApi?: PurchasedApiCreateNestedManyWithoutApiInput
     Review?: ReviewCreateNestedManyWithoutApiInput
     UsageLog?: UsageLogCreateNestedManyWithoutApiInput
-    PurchasedApi?: PurchasedApiCreateNestedManyWithoutApiInput
   }
 
   export type ApiUncheckedCreateWithoutTokenInput = {
@@ -15966,9 +15982,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt: Date | string
     Favorite?: FavoriteUncheckedCreateNestedManyWithoutApiInput
+    PurchasedApi?: PurchasedApiUncheckedCreateNestedManyWithoutApiInput
     Review?: ReviewUncheckedCreateNestedManyWithoutApiInput
     UsageLog?: UsageLogUncheckedCreateNestedManyWithoutApiInput
-    PurchasedApi?: PurchasedApiUncheckedCreateNestedManyWithoutApiInput
   }
 
   export type ApiCreateOrConnectWithoutTokenInput = {
@@ -16098,9 +16114,9 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     Provider?: ProviderUpdateOneRequiredWithoutApiNestedInput
     Favorite?: FavoriteUpdateManyWithoutApiNestedInput
+    PurchasedApi?: PurchasedApiUpdateManyWithoutApiNestedInput
     Review?: ReviewUpdateManyWithoutApiNestedInput
     UsageLog?: UsageLogUpdateManyWithoutApiNestedInput
-    PurchasedApi?: PurchasedApiUpdateManyWithoutApiNestedInput
   }
 
   export type ApiUncheckedUpdateWithoutTokenInput = {
@@ -16130,9 +16146,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     Favorite?: FavoriteUncheckedUpdateManyWithoutApiNestedInput
+    PurchasedApi?: PurchasedApiUncheckedUpdateManyWithoutApiNestedInput
     Review?: ReviewUncheckedUpdateManyWithoutApiNestedInput
     UsageLog?: UsageLogUncheckedUpdateManyWithoutApiNestedInput
-    PurchasedApi?: PurchasedApiUncheckedUpdateManyWithoutApiNestedInput
   }
 
   export type ProviderUpsertWithoutTokenInput = {
@@ -16494,9 +16510,9 @@ export namespace Prisma {
     updatedAt: Date | string
     Provider: ProviderCreateNestedOneWithoutApiInput
     Favorite?: FavoriteCreateNestedManyWithoutApiInput
+    PurchasedApi?: PurchasedApiCreateNestedManyWithoutApiInput
     Review?: ReviewCreateNestedManyWithoutApiInput
     Token?: TokenCreateNestedManyWithoutApiInput
-    PurchasedApi?: PurchasedApiCreateNestedManyWithoutApiInput
   }
 
   export type ApiUncheckedCreateWithoutUsageLogInput = {
@@ -16526,9 +16542,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt: Date | string
     Favorite?: FavoriteUncheckedCreateNestedManyWithoutApiInput
+    PurchasedApi?: PurchasedApiUncheckedCreateNestedManyWithoutApiInput
     Review?: ReviewUncheckedCreateNestedManyWithoutApiInput
     Token?: TokenUncheckedCreateNestedManyWithoutApiInput
-    PurchasedApi?: PurchasedApiUncheckedCreateNestedManyWithoutApiInput
   }
 
   export type ApiCreateOrConnectWithoutUsageLogInput = {
@@ -16607,9 +16623,9 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     Provider?: ProviderUpdateOneRequiredWithoutApiNestedInput
     Favorite?: FavoriteUpdateManyWithoutApiNestedInput
+    PurchasedApi?: PurchasedApiUpdateManyWithoutApiNestedInput
     Review?: ReviewUpdateManyWithoutApiNestedInput
     Token?: TokenUpdateManyWithoutApiNestedInput
-    PurchasedApi?: PurchasedApiUpdateManyWithoutApiNestedInput
   }
 
   export type ApiUncheckedUpdateWithoutUsageLogInput = {
@@ -16639,9 +16655,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     Favorite?: FavoriteUncheckedUpdateManyWithoutApiNestedInput
+    PurchasedApi?: PurchasedApiUncheckedUpdateManyWithoutApiNestedInput
     Review?: ReviewUncheckedUpdateManyWithoutApiNestedInput
     Token?: TokenUncheckedUpdateManyWithoutApiNestedInput
-    PurchasedApi?: PurchasedApiUncheckedUpdateManyWithoutApiNestedInput
   }
 
   export type TokenUpsertWithoutUsageLogInput = {
@@ -16689,6 +16705,17 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type PurchasedApiCreateManyApiInput = {
+    id: string
+    developerAddress: string
+    providerId: string
+    transactionHash: string
+    paymentAmount: string
+    status?: string
+    expiresAt: Date | string
+    createdAt?: Date | string
+  }
+
   export type ReviewCreateManyApiInput = {
     id: string
     reviewerAddress: string
@@ -16731,17 +16758,6 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
-  export type PurchasedApiCreateManyApiInput = {
-    id: string
-    developerAddress: string
-    providerId: string
-    transactionHash: string
-    paymentAmount: string
-    status?: string
-    expiresAt: Date | string
-    createdAt?: Date | string
-  }
-
   export type FavoriteUpdateWithoutApiInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
@@ -16757,6 +16773,39 @@ export namespace Prisma {
   export type FavoriteUncheckedUpdateManyWithoutApiInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PurchasedApiUpdateWithoutApiInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    developerAddress?: StringFieldUpdateOperationsInput | string
+    transactionHash?: StringFieldUpdateOperationsInput | string
+    paymentAmount?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    Provider?: ProviderUpdateOneRequiredWithoutPurchasedApiNestedInput
+  }
+
+  export type PurchasedApiUncheckedUpdateWithoutApiInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    developerAddress?: StringFieldUpdateOperationsInput | string
+    providerId?: StringFieldUpdateOperationsInput | string
+    transactionHash?: StringFieldUpdateOperationsInput | string
+    paymentAmount?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PurchasedApiUncheckedUpdateManyWithoutApiInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    developerAddress?: StringFieldUpdateOperationsInput | string
+    providerId?: StringFieldUpdateOperationsInput | string
+    transactionHash?: StringFieldUpdateOperationsInput | string
+    paymentAmount?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -16888,39 +16937,6 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type PurchasedApiUpdateWithoutApiInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    developerAddress?: StringFieldUpdateOperationsInput | string
-    transactionHash?: StringFieldUpdateOperationsInput | string
-    paymentAmount?: StringFieldUpdateOperationsInput | string
-    status?: StringFieldUpdateOperationsInput | string
-    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    Provider?: ProviderUpdateOneRequiredWithoutPurchasedApiNestedInput
-  }
-
-  export type PurchasedApiUncheckedUpdateWithoutApiInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    developerAddress?: StringFieldUpdateOperationsInput | string
-    providerId?: StringFieldUpdateOperationsInput | string
-    transactionHash?: StringFieldUpdateOperationsInput | string
-    paymentAmount?: StringFieldUpdateOperationsInput | string
-    status?: StringFieldUpdateOperationsInput | string
-    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type PurchasedApiUncheckedUpdateManyWithoutApiInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    developerAddress?: StringFieldUpdateOperationsInput | string
-    providerId?: StringFieldUpdateOperationsInput | string
-    transactionHash?: StringFieldUpdateOperationsInput | string
-    paymentAmount?: StringFieldUpdateOperationsInput | string
-    status?: StringFieldUpdateOperationsInput | string
-    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
   export type ApiCreateManyProviderInput = {
     id: string
     name: string
@@ -16961,6 +16977,17 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type PurchasedApiCreateManyProviderInput = {
+    id: string
+    apiId: string
+    developerAddress: string
+    transactionHash: string
+    paymentAmount: string
+    status?: string
+    expiresAt: Date | string
+    createdAt?: Date | string
+  }
+
   export type TokenCreateManyProviderInput = {
     id: string
     apiId: string
@@ -16971,17 +16998,6 @@ export namespace Prisma {
     expiresAt: Date | string
     lastValidAfter: Date | string
     requestMetadata?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: Date | string
-  }
-
-  export type PurchasedApiCreateManyProviderInput = {
-    id: string
-    apiId: string
-    developerAddress: string
-    transactionHash: string
-    paymentAmount: string
-    status?: string
-    expiresAt: Date | string
     createdAt?: Date | string
   }
 
@@ -17011,10 +17027,10 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     Favorite?: FavoriteUpdateManyWithoutApiNestedInput
+    PurchasedApi?: PurchasedApiUpdateManyWithoutApiNestedInput
     Review?: ReviewUpdateManyWithoutApiNestedInput
     Token?: TokenUpdateManyWithoutApiNestedInput
     UsageLog?: UsageLogUpdateManyWithoutApiNestedInput
-    PurchasedApi?: PurchasedApiUpdateManyWithoutApiNestedInput
   }
 
   export type ApiUncheckedUpdateWithoutProviderInput = {
@@ -17043,10 +17059,10 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     Favorite?: FavoriteUncheckedUpdateManyWithoutApiNestedInput
+    PurchasedApi?: PurchasedApiUncheckedUpdateManyWithoutApiNestedInput
     Review?: ReviewUncheckedUpdateManyWithoutApiNestedInput
     Token?: TokenUncheckedUpdateManyWithoutApiNestedInput
     UsageLog?: UsageLogUncheckedUpdateManyWithoutApiNestedInput
-    PurchasedApi?: PurchasedApiUncheckedUpdateManyWithoutApiNestedInput
   }
 
   export type ApiUncheckedUpdateManyWithoutProviderInput = {
@@ -17115,6 +17131,39 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type PurchasedApiUpdateWithoutProviderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    developerAddress?: StringFieldUpdateOperationsInput | string
+    transactionHash?: StringFieldUpdateOperationsInput | string
+    paymentAmount?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    Api?: ApiUpdateOneRequiredWithoutPurchasedApiNestedInput
+  }
+
+  export type PurchasedApiUncheckedUpdateWithoutProviderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    apiId?: StringFieldUpdateOperationsInput | string
+    developerAddress?: StringFieldUpdateOperationsInput | string
+    transactionHash?: StringFieldUpdateOperationsInput | string
+    paymentAmount?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PurchasedApiUncheckedUpdateManyWithoutProviderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    apiId?: StringFieldUpdateOperationsInput | string
+    developerAddress?: StringFieldUpdateOperationsInput | string
+    transactionHash?: StringFieldUpdateOperationsInput | string
+    paymentAmount?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type TokenUpdateWithoutProviderInput = {
     id?: StringFieldUpdateOperationsInput | string
     developerAddress?: StringFieldUpdateOperationsInput | string
@@ -17153,39 +17202,6 @@ export namespace Prisma {
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     lastValidAfter?: DateTimeFieldUpdateOperationsInput | Date | string
     requestMetadata?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type PurchasedApiUpdateWithoutProviderInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    developerAddress?: StringFieldUpdateOperationsInput | string
-    transactionHash?: StringFieldUpdateOperationsInput | string
-    paymentAmount?: StringFieldUpdateOperationsInput | string
-    status?: StringFieldUpdateOperationsInput | string
-    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    Api?: ApiUpdateOneRequiredWithoutPurchasedApiNestedInput
-  }
-
-  export type PurchasedApiUncheckedUpdateWithoutProviderInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    apiId?: StringFieldUpdateOperationsInput | string
-    developerAddress?: StringFieldUpdateOperationsInput | string
-    transactionHash?: StringFieldUpdateOperationsInput | string
-    paymentAmount?: StringFieldUpdateOperationsInput | string
-    status?: StringFieldUpdateOperationsInput | string
-    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type PurchasedApiUncheckedUpdateManyWithoutProviderInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    apiId?: StringFieldUpdateOperationsInput | string
-    developerAddress?: StringFieldUpdateOperationsInput | string
-    transactionHash?: StringFieldUpdateOperationsInput | string
-    paymentAmount?: StringFieldUpdateOperationsInput | string
-    status?: StringFieldUpdateOperationsInput | string
-    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 

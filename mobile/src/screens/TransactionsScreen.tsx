@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, Button } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
 import { ethers } from 'ethers';
 import { useWallet } from '../wallet/WalletContext';
-import { fetchTransactionHistory } from '../wallet/utils';
+// import { fetchTransactionHistory } from '../wallet/utils'; // Replaced by Prisma
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export default function TransactionsScreen() {
-    const { address, chainId } = useWallet();
+    const { address } = useWallet();
     const [transactions, setTransactions] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     async function fetchTransactions() {
-        if (!address || !chainId) {
+        if (!address) {
             setError("Wallet not connected");
             return;
         }
@@ -19,9 +22,39 @@ export default function TransactionsScreen() {
         setLoading(true);
         setError(null);
         try {
-            const history = await fetchTransactionHistory(address, chainId);
-            setTransactions(history);
+            // Fetch from Prisma
+            // Note: In a real mobile app, this would be an API call. 
+            // Direct DB access via Prisma Client works in Node.js environments (e.g. testing, local scripts), 
+            // but not directly in Expo Go/Native. Assuming this is for a specific local setup or prototype.
+            const history = await prisma.purchasedApi.findMany({
+                where: {
+                    OR: [
+                        { developerAddress: address },
+                        { providerId: address } // Assuming providerId might be an address or mapped to one
+                    ]
+                },
+                include: {
+                    Provider: true,
+                    Api: true
+                },
+                orderBy: {
+                    createdAt: 'desc'
+                }
+            });
+
+            const formattedHistory = history.map(tx => ({
+                hash: tx.transactionHash,
+                from: tx.developerAddress,
+                to: tx.Provider.walletAddress, // Using Provider's wallet address as 'to'
+                value: tx.paymentAmount,
+                timeStamp: Math.floor(new Date(tx.createdAt).getTime() / 1000),
+                blockNumber: 1, // Fake block number for "Confirmed" status
+                status: tx.status
+            }));
+
+            setTransactions(formattedHistory);
         } catch (e: any) {
+            console.error(e);
             setError(e.message || "Failed to fetch transactions");
         } finally {
             setLoading(false);
@@ -29,14 +62,14 @@ export default function TransactionsScreen() {
     }
 
     useEffect(() => {
-        if (address && chainId) {
+        if (address) {
             fetchTransactions();
         }
-    }, [address, chainId]);
+    }, [address]);
 
     const renderItem = ({ item }: { item: any }) => {
         const date = item.blockNumber ? "Confirmed" : "Pending";
-        const value = item.value ? ethers.formatEther(item.value) : "0";
+        const value = item.value ? item.value : "0"; // Already formatted as string in seed/DB?
 
         return (
             <View style={styles.item}>
@@ -47,6 +80,10 @@ export default function TransactionsScreen() {
                 <View style={styles.row}>
                     <Text style={styles.label}>{item.from.toLowerCase() === address?.toLowerCase() ? "Sent" : "Received"}</Text>
                     <Text style={styles.value}>{value} ETH</Text>
+                </View>
+                <View style={styles.row}>
+                    <Text style={styles.date}>{new Date(item.timeStamp * 1000).toLocaleString()}</Text>
+                    <Text style={[styles.date, { color: item.status === 'ACTIVE' ? 'green' : 'red' }]}>{item.status}</Text>
                 </View>
             </View>
         );
