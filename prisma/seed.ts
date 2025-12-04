@@ -1,9 +1,11 @@
+import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
 
 
-const prisma = new PrismaClient();
+let prisma: PrismaClient;
 
 async function main() {
+    prisma = new PrismaClient();
     console.log('Seeding database...');
 
     // Create a provider
@@ -68,6 +70,36 @@ async function main() {
             status: 'ACTIVE',
             expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 48), // 2 days from now
         },
+        {
+            id: 'tx-4',
+            apiId: api.id,
+            developerAddress: '0xUserAddress123',
+            providerId: provider.id,
+            transactionHash: '0xFakeHash4',
+            paymentAmount: '0.15',
+            status: 'COMPLETED',
+            expiresAt: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
+        },
+        {
+            id: 'tx-5',
+            apiId: api.id,
+            developerAddress: '0xUserAddress123',
+            providerId: provider.id,
+            transactionHash: '0xFakeHash5',
+            paymentAmount: '0.005',
+            status: 'FAILED',
+            expiresAt: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
+        },
+        {
+            id: 'tx-6',
+            apiId: api.id,
+            developerAddress: '0xUserAddress123',
+            providerId: provider.id,
+            transactionHash: '0xFakeHash6',
+            paymentAmount: '1.2',
+            status: 'PENDING',
+            expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 1), // 1 hour from now
+        }
     ];
 
     for (const tx of transactions) {
@@ -87,5 +119,5 @@ main()
         process.exit(1);
     })
     .finally(async () => {
-        await prisma.$disconnect();
+        if (prisma) await prisma.$disconnect();
     });
