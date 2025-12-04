@@ -7,7 +7,8 @@ mobile/node_modules/
 mobile/.expo/
 
 # Environment files
-
+.env
+mobile/.env
 
 # Logs
 npm-debug.log*

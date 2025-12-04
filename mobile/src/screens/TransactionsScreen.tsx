@@ -2,10 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
 import { ethers } from 'ethers';
 import { useWallet } from '../wallet/WalletContext';
-// import { fetchTransactionHistory } from '../wallet/utils'; // Replaced by Prisma
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { apiGet } from '../api/client';
 
 export default function TransactionsScreen() {
     const { address } = useWallet();
@@ -22,37 +19,13 @@ export default function TransactionsScreen() {
         setLoading(true);
         setError(null);
         try {
-            // Fetch from Prisma
-            // Note: In a real mobile app, this would be an API call. 
-            // Direct DB access via Prisma Client works in Node.js environments (e.g. testing, local scripts), 
-            // but not directly in Expo Go/Native. Assuming this is for a specific local setup or prototype.
-            const history = await prisma.purchasedApi.findMany({
-                where: {
-                    OR: [
-                        { developerAddress: address },
-                        { providerId: address } // Assuming providerId might be an address or mapped to one
-                    ]
-                },
-                include: {
-                    Provider: true,
-                    Api: true
-                },
-                orderBy: {
-                    createdAt: 'desc'
-                }
-            });
+            const res = await apiGet(`/api/transactions?address=${address}`);
 
-            const formattedHistory = history.map(tx => ({
-                hash: tx.transactionHash,
-                from: tx.developerAddress,
-                to: tx.Provider.walletAddress, // Using Provider's wallet address as 'to'
-                value: tx.paymentAmount,
-                timeStamp: Math.floor(new Date(tx.createdAt).getTime() / 1000),
-                blockNumber: 1, // Fake block number for "Confirmed" status
-                status: tx.status
-            }));
+            if (!res.ok) {
+                throw new Error(res.error || "Failed to fetch transactions");
+            }
 
-            setTransactions(formattedHistory);
+            setTransactions(res.data);
         } catch (e: any) {
             console.error(e);
             setError(e.message || "Failed to fetch transactions");
@@ -99,7 +72,7 @@ export default function TransactionsScreen() {
 
             <FlatList
                 data={transactions}
-                keyExtractor={(item) => item.hash}
+                keyExtractor={(item, index) => item.hash ? `${item.hash}-${index}` : `tx-${index}`}
                 renderItem={renderItem}
                 ListEmptyComponent={!loading && address ? <Text style={styles.empty}>No transactions found</Text> : null}
                 refreshing={loading}

@@ -1,3 +1,6 @@
+packages:
+  - 'mobile'
+
 onlyBuiltDependencies:
   - '@prisma/engines'
   - prisma
