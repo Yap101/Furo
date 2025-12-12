@@ -96,6 +96,26 @@ export async function apiGet<T = any>(endpoint: string, opts: FetchOptions = {})
         return { ok: true, status: 200, data: MOCK_TRANSACTIONS as any };
       }
 
+      if (endpoint.includes('/api/providers/me/report')) {
+        console.log('Network failed, returning MOCK DATA for report');
+        return {
+          ok: true, status: 200, data: {
+            revenue: { total: '12.5' },
+            performance: {
+              totalRequests: 1250,
+              averageResponseTime: 45,
+              successRate: 99.9
+            },
+            purchasesByApi: [
+              { apiName: 'Weather API', count: 150 },
+              { apiName: 'Crypto Price', count: 85 },
+              { apiName: 'Image Gen', count: 45 },
+              { apiName: 'Text to Speech', count: 30 }
+            ]
+          } as any
+        };
+      }
+
       return { ok: false, status: 0, error: errorMsg };
     }
   }

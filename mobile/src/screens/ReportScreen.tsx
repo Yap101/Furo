@@ -1,18 +1,24 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useWallet } from '../wallet/WalletContext';
 import { View, Text, ActivityIndicator, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { BarChart } from 'react-native-gifted-charts';
 import { apiGet } from '../api/client';
 
 export default function ReportScreen() {
+  const { address } = useWallet();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [report, setReport] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const fetchReport = useCallback(async () => {
+    if (!address) {
+      setLoading(false);
+      return;
+    }
     setError(null);
     try {
-      const res = await apiGet('/api/providers/me/report?period=30');
+      const res = await apiGet(`/api/providers/me/report?period=30&address=${address}`);
       if (!res.ok) {
         setError(res.error || 'Failed to fetch report');
       } else {
@@ -24,11 +30,13 @@ export default function ReportScreen() {
       setLoading(false);
       setRefreshing(false);
     }
-  }, []);
+  }, [address]);
 
   useEffect(() => {
-    fetchReport();
-  }, [fetchReport]);
+    if (address) {
+      fetchReport();
+    }
+  }, [fetchReport, address]);
 
   const onRefresh = () => {
     setRefreshing(true);
