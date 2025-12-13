@@ -126,6 +126,62 @@ app.get('/api/providers/me/report', async (req: express.Request, res: express.Re
     }
 });
 
+app.post('/api/providers/me/apis', async (req: express.Request, res: express.Response) => {
+    // For now, we simulate "me" by taking providerId or walletAddress from body or assume a single user context if auth isn't fully set up.
+    // Based on existing code conventions, it seems we might need to rely on a hardcoded provider or pass it in.
+    // However, looking at the schema, Api requires providerId.
+    // Let's check if we can get a default provider or if the client sends something identifying.
+    // The previous client code didn't send auth headers.
+    // We will assume a default provider exists or create one for "me" if missing, 
+    // BUT strictly for this prototype, let's find the FIRST provider or create a seed one.
+
+    try {
+        let provider = await prisma.provider.findFirst();
+        if (!provider) {
+            provider = await prisma.provider.create({
+                data: {
+                    id: `provider_${Date.now()}`,
+                    walletAddress: '0xDefaultProvider',
+                    name: 'Default Provider',
+                    email: 'provider@furo.com',
+                    updatedAt: new Date()
+                }
+            });
+        }
+
+        const { name, description, category, endpoint, price, currency } = req.body;
+
+        if (!name || !endpoint || !price) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
+
+        // Generate a simple public path
+        const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        const publicPath = `/api/${provider.id.split('-')[0]}/${slug}-${Date.now()}`;
+
+        const newApi = await prisma.api.create({
+            data: {
+                id: `api_${Date.now()}`,
+                providerId: provider.id,
+                name,
+                description: description || '',
+                category: category || 'Uncategorized',
+                endpoint,
+                publicPath,
+                pricePerCall: price,
+                currency: currency || 'ETH',
+                isActive: true,
+                updatedAt: new Date()
+            }
+        });
+
+        res.json({ data: newApi });
+    } catch (error: any) {
+        console.error('Error creating API:', error);
+        res.status(500).json({ error: error.message || 'Internal server error' });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
