@@ -6,17 +6,19 @@
     "start": "pnpm -C mobile start",
     "android": "pnpm -C mobile android",
     "ios": "pnpm -C mobile ios",
-    "web": "pnpm -C mobile web"
+    "web": "pnpm -C mobile web",
+    "server": "ts-node server.ts",
+    "dev": "start /b pnpm server && pnpm start"
   },
   "devDependencies": {
-    "@prisma/client": "^7.1.0",
+    "@prisma/client": "^6.0.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/node": "^24.10.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
-    "prisma": "^7.1.0",
+    "prisma": "^6.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }

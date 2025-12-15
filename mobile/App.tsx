@@ -9,9 +9,31 @@ import BalanceScreen from './src/screens/BalanceScreen';
 import ReportScreen from './src/screens/ReportScreen';
 import UploadApiScreen from './src/screens/UploadApiScreen';
 import TransactionsScreen from './src/screens/TransactionsScreen';
-import { WalletProvider } from './src/wallet/WalletContext';
+import WalletScreen from './src/screens/WalletScreen';
+import { WalletProvider, useWallet } from './src/wallet/WalletContext';
 
 const Stack = createNativeStackNavigator();
+
+function RootNavigator() {
+  const { connected } = useWallet();
+
+  return (
+    <Stack.Navigator initialRouteName="Connect">
+      {!connected ? (
+        <Stack.Screen name="Connect" component={WalletScreen} options={{ title: 'Connect Wallet' }} />
+      ) : (
+        <>
+          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="Balance" component={BalanceScreen} />
+          <Stack.Screen name="Transactions" component={TransactionsScreen} />
+          <Stack.Screen name="Report" component={ReportScreen} />
+          <Stack.Screen name="Upload" component={UploadApiScreen} />
+          <Stack.Screen name="Wallet" component={WalletScreen} />
+        </>
+      )}
+    </Stack.Navigator>
+  );
+}
 
 export default function App() {
   const linking: LinkingOptions<any> = {
@@ -29,13 +51,7 @@ export default function App() {
   return (
     <WalletProvider>
       <NavigationContainer linking={linking}>
-        <Stack.Navigator initialRouteName="Home">
-          <Stack.Screen name="Home" component={HomeScreen} />
-          <Stack.Screen name="Balance" component={BalanceScreen} />
-          <Stack.Screen name="Transactions" component={TransactionsScreen} />
-          <Stack.Screen name="Report" component={ReportScreen} />
-          <Stack.Screen name="Upload" component={UploadApiScreen} />
-        </Stack.Navigator>
+        <RootNavigator />
       </NavigationContainer>
     </WalletProvider>
   );

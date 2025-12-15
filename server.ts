@@ -1,6 +1,12 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import { PrismaClient } from '@prisma/client';
+
+if (!process.env.DATABASE_URL) {
+    console.error('Error: DATABASE_URL is missing in .env');
+    process.exit(1);
+}
 
 const prisma = new PrismaClient();
 const app = express();

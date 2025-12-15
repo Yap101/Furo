@@ -114,7 +114,11 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     (async () => {
       if (!client || !session || validated || validating) return;
-      if (validationAttemptsRef.current > 2) return;
+      if (validationAttemptsRef.current > 2) {
+        // Too many failures, nuke it
+        await forceResetInternal();
+        return;
+      }
       setValidating(true);
       try {
         // @ts-ignore
@@ -123,16 +127,41 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
           await client.ping({ topic: session.topic });
         }
         setValidated(true);
-      } catch {
-        setSession(null);
-        AsyncStorage.removeItem(WC_SESSION_KEY).catch(() => { });
-        setValidated(false);
-        validationAttemptsRef.current += 1;
+      } catch (e: any) {
+        console.log('[WC] Ping failed', e);
+        const msg = e?.message || String(e);
+        if (/No matching key/i.test(msg) || /without any listeners/i.test(msg)) {
+          // Critical session error, must clear
+          await forceResetInternal();
+        } else {
+          // Soft failure, maybe retry or just clear
+          setSession(null);
+          AsyncStorage.removeItem(WC_SESSION_KEY).catch(() => { });
+          setValidated(false);
+          validationAttemptsRef.current += 1;
+        }
       } finally {
         setValidating(false);
       }
     })();
   }, [client, session, validated, validating]);
+
+  // Internal helper to avoid circular deps with the context value
+  const forceResetInternal = async () => {
+    pendingApprovalRef.current = null;
+    cancelRejectRef.current = null;
+    setPairingUri(null);
+    setSession(null);
+    setValidated(false);
+    try {
+      const keys = await AsyncStorage.getAllKeys();
+      const targets = keys.filter(k => k.startsWith('walletconnect') || k.includes('wc@') || k.includes('wc_session'));
+      if (targets.length) await AsyncStorage.multiRemove(targets);
+    } catch { }
+    await AsyncStorage.removeItem(WC_SESSION_KEY).catch(() => { });
+    setLastError(null);
+    console.log('[WC] Force reset executed (internal)');
+  };
 
   const connect = useCallback(async (opts?: { chains?: string[] }) => {
     if (initError) throw new Error(initError);
@@ -278,21 +307,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     },
     validated,
     validating,
-    forceReset: async () => {
-      pendingApprovalRef.current = null;
-      cancelRejectRef.current = null;
-      setPairingUri(null);
-      setSession(null);
-      setValidated(false);
-      try {
-        const keys = await AsyncStorage.getAllKeys();
-        const targets = keys.filter(k => k.startsWith('walletconnect') || k.includes('wc@') || k.includes('wc_session'));
-        if (targets.length) await AsyncStorage.multiRemove(targets);
-      } catch { }
-      await AsyncStorage.removeItem(WC_SESSION_KEY).catch(() => { });
-      setLastError(null);
-      console.log('[WC] Force reset executed');
-    },
+    forceReset: forceResetInternal,
     lastError,
     purgeStorage: async () => {
       try {

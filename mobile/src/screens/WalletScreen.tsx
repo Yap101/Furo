@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ConnectWalletModal from '../components/ConnectWalletModal';
 import { View, Text, Button, StyleSheet, Alert } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { useWallet } from '../wallet/WalletContext';
@@ -75,9 +76,29 @@ export default function WalletScreen() {
     }
   }
 
+  const [modalVisible, setModalVisible] = useState(false);
+
+  async function onConnectPress() {
+    setModalVisible(true);
+    // Connect will be triggered by the modal or manual if needed
+    if (!pairingUri) {
+      try { await connect(); } catch { }
+    }
+  }
+
+  // .. existing event handlers but we don't display pairingUri directly anymore (or minimal) 
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Wallet</Text>
+
+      <ConnectWalletModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        pairingUri={pairingUri}
+        connect={connect}
+      />
+
       {initError ? (
         <>
           <Text style={{ color: 'red' }}>{initError}</Text>
@@ -98,17 +119,17 @@ export default function WalletScreen() {
           <Button title="Disconnect" onPress={disconnect} />
         </>
       ) : (
-        <>
-          <Button title={loading ? 'Connecting...' : 'Connect Wallet'} onPress={onConnect} disabled={loading} />
-          {pairingUri ? (
-            <>
-              <View style={{ height: 12 }} />
-              <Text selectable numberOfLines={2} style={styles.uri}>{pairingUri}</Text>
-              <View style={{ height: 8 }} />
-              <Button title="Copy URI" onPress={onCopyUri} />
-            </>
-          ) : null}
-        </>
+        <View style={{ justifyContent: 'center', flex: 1 }}>
+          <Text style={{ textAlign: 'center', marginBottom: 20, color: '#666' }}>
+            Connect your wallet to access Furo.
+          </Text>
+          <Button title={loading ? 'Connecting...' : 'Connect Wallet'} onPress={onConnectPress} disabled={loading} />
+
+          {/* Debug: still show URI if strictly needed, or hide it. 
+              User wants POPUP, so hiding URI is cleaner. 
+              But let's keep a small "Copy Link" button just in case underneath? 
+          */}
+        </View>
       )}
     </View>
   );
