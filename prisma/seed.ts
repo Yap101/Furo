@@ -1,11 +1,18 @@
 import 'dotenv/config';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from './generated/prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 
+let prisma: ReturnType<typeof createPrismaClient>;
 
-let prisma: PrismaClient;
+function createPrismaClient() {
+    // Use direct PostgreSQL connection for local development with prisma dev
+    const connectionString = process.env.DIRECT_DATABASE_URL || process.env.DATABASE_URL!;
+    const adapter = new PrismaPg({ connectionString });
+    return new PrismaClient({ adapter });
+}
 
 async function main() {
-    prisma = new PrismaClient();
+    prisma = createPrismaClient();
     console.log('Seeding database...');
 
     // Create a provider
@@ -43,12 +50,12 @@ async function main() {
         {
             id: 'tx-1',
             apiId: api.id,
-            developerAddress: '0xUserAddress123', // This should match the user's wallet address in the app for testing
+            developerAddress: '0xUserAddress123',
             providerId: provider.id,
             transactionHash: '0xFakeHash1',
             paymentAmount: '0.01',
             status: 'ACTIVE',
-            expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24), // 1 day from now
+            expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
         },
         {
             id: 'tx-2',
@@ -58,7 +65,7 @@ async function main() {
             transactionHash: '0xFakeHash2',
             paymentAmount: '0.05',
             status: 'EXPIRED',
-            expiresAt: new Date(Date.now() - 1000 * 60 * 60), // 1 hour ago
+            expiresAt: new Date(Date.now() - 1000 * 60 * 60),
         },
         {
             id: 'tx-3',
@@ -68,7 +75,7 @@ async function main() {
             transactionHash: '0xFakeHash3',
             paymentAmount: '0.02',
             status: 'ACTIVE',
-            expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 48), // 2 days from now
+            expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 48),
         },
         {
             id: 'tx-4',
@@ -78,7 +85,7 @@ async function main() {
             transactionHash: '0xFakeHash4',
             paymentAmount: '0.15',
             status: 'COMPLETED',
-            expiresAt: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
+            expiresAt: new Date(Date.now() - 1000 * 60 * 60 * 24),
         },
         {
             id: 'tx-5',
@@ -88,7 +95,7 @@ async function main() {
             transactionHash: '0xFakeHash5',
             paymentAmount: '0.005',
             status: 'FAILED',
-            expiresAt: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
+            expiresAt: new Date(Date.now() - 1000 * 60 * 60 * 2),
         },
         {
             id: 'tx-6',
@@ -98,7 +105,7 @@ async function main() {
             transactionHash: '0xFakeHash6',
             paymentAmount: '1.2',
             status: 'PENDING',
-            expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 1), // 1 hour from now
+            expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 1),
         }
     ];
 

@@ -1,14 +1,18 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from './prisma/generated/prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 
-if (!process.env.DATABASE_URL) {
-    console.error('Error: DATABASE_URL is missing in .env');
+if (!process.env.DIRECT_DATABASE_URL && !process.env.DATABASE_URL) {
+    console.error('Error: DATABASE_URL or DIRECT_DATABASE_URL is missing in .env');
     process.exit(1);
 }
 
-const prisma = new PrismaClient();
+// Use direct PostgreSQL connection for local development with prisma dev
+const connectionString = process.env.DIRECT_DATABASE_URL || process.env.DATABASE_URL!;
+const adapter = new PrismaPg({ connectionString });
+const prisma = new PrismaClient({ adapter });
 const app = express();
 const PORT = 3000;
 

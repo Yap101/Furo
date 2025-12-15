@@ -9,8 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
-    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    var _ = { label: 0, sent: function () { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
+    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function () { return this; }), g;
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
@@ -50,33 +50,33 @@ function main() {
                     prisma = new client_1.PrismaClient();
                     console.log('Seeding database...');
                     return [4 /*yield*/, prisma.provider.upsert({
-                            where: { walletAddress: '0xProviderAddress123' },
-                            update: {},
-                            create: {
-                                id: 'provider-1',
-                                walletAddress: '0xProviderAddress123',
-                                name: 'Test Provider',
-                                email: 'provider@test.com',
-                                updatedAt: new Date(),
-                            },
-                        })];
+                        where: { walletAddress: '0xProviderAddress123' },
+                        update: {},
+                        create: {
+                            id: 'provider-1',
+                            walletAddress: '0xProviderAddress123',
+                            name: 'Test Provider',
+                            email: 'provider@test.com',
+                            updatedAt: new Date(),
+                        },
+                    })];
                 case 1:
                     provider = _a.sent();
                     return [4 /*yield*/, prisma.api.upsert({
-                            where: { publicPath: '/api/test' },
-                            update: {},
-                            create: {
-                                id: 'api-1',
-                                providerId: provider.id,
-                                name: 'Test API',
-                                description: 'A test API',
-                                category: 'Test',
-                                endpoint: 'https://api.test.com',
-                                publicPath: '/api/test',
-                                pricePerCall: '0.001',
-                                updatedAt: new Date(),
-                            },
-                        })];
+                        where: { publicPath: '/api/test' },
+                        update: {},
+                        create: {
+                            id: 'api-1',
+                            providerId: provider.id,
+                            name: 'Test API',
+                            description: 'A test API',
+                            category: 'Test',
+                            endpoint: 'https://api.test.com',
+                            publicPath: '/api/test',
+                            pricePerCall: '0.001',
+                            updatedAt: new Date(),
+                        },
+                    })];
                 case 2:
                     api = _a.sent();
                     transactions = [
@@ -147,10 +147,10 @@ function main() {
                     if (!(_i < transactions_1.length)) return [3 /*break*/, 6];
                     tx = transactions_1[_i];
                     return [4 /*yield*/, prisma.purchasedApi.upsert({
-                            where: { id: tx.id },
-                            update: {},
-                            create: tx,
-                        })];
+                        where: { id: tx.id },
+                        update: {},
+                        create: tx,
+                    })];
                 case 4:
                     _a.sent();
                     _a.label = 5;
@@ -166,19 +166,21 @@ function main() {
 }
 main()
     .catch(function (e) {
-    console.error(e);
-    process.exit(1);
-})
-    .finally(function () { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                if (!prisma) return [3 /*break*/, 2];
-                return [4 /*yield*/, prisma.$disconnect()];
-            case 1:
-                _a.sent();
-                _a.label = 2;
-            case 2: return [2 /*return*/];
-        }
+        console.error(e);
+        process.exit(1);
+    })
+    .finally(function () {
+        return __awaiter(void 0, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!prisma) return [3 /*break*/, 2];
+                        return [4 /*yield*/, prisma.$disconnect()];
+                    case 1:
+                        _a.sent();
+                        _a.label = 2;
+                    case 2: return [2 /*return*/];
+                }
+            });
+        });
     });
-}); });
