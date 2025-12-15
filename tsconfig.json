@@ -8,6 +8,8 @@
         "skipLibCheck": true
     },
     "include": [
-        "prisma.config.ts"
+        "prisma.config.ts",
+        "server.ts",
+        "prisma/seed.ts"
     ]
 }
