@@ -1,187 +1,290 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, StatusBar, TouchableOpacity } from 'react-native';
 import { useWallet } from '../wallet/WalletContext';
-import { View, Text, ActivityIndicator, StyleSheet, ScrollView, RefreshControl } from 'react-native';
-import { BarChart } from 'react-native-gifted-charts';
-import { apiGet } from '../api/client';
+import { PieChart } from 'react-native-gifted-charts';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import DateRangeFilter from '../components/DateRangeFilter';
 
-export default function ReportScreen() {
+export default function ReportScreen({ navigation }: any) {
   const { address } = useWallet();
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [report, setReport] = useState<any | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [startDate, setStartDate] = useState(new Date('2023-01-01'));
+  const [endDate, setEndDate] = useState(new Date('2024-12-31'));
+  const [filteredSales, setFilteredSales] = useState<any[]>([]);
 
-  const fetchReport = useCallback(async () => {
-    if (!address) {
-      setLoading(false);
-      return;
-    }
-    setError(null);
-    try {
-      const res = await apiGet(`/api/providers/me/report?period=30&address=${address}`);
-      if (!res.ok) {
-        setError(res.error || 'Failed to fetch report');
-      } else {
-        setReport(res.data || null);
-      }
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch report');
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, [address]);
+  // Mock Data for Design (Image 2)
+  const pieData = [
+    { value: 97, color: '#222222', text: '97%' },
+    { value: 3, color: '#E0E0E0', text: '3%' },
+  ];
+
+  // Expanded Mock Sales
+  const MOCK_SALES = [
+    // 2024
+    { id: '1', date: '2024-01-15', calls: '300 calls', amount: 0.00372, sub: 0.00013 },
+    { id: '2', date: '2024-01-14', calls: '120 calls', amount: 0.00402, sub: 0.00011 },
+    { id: '3', date: '2024-01-13', calls: '250 calls', amount: 0.03748, sub: 0.00004 },
+    // 2023
+    { id: '4', date: '2023-11-20', calls: '200 calls', amount: 0.00510, sub: 0.00013 },
+    { id: '5', date: '2023-10-15', calls: '180 calls', amount: 0.00450, sub: 0.00016 },
+    { id: '6', date: '2023-06-01', calls: '1000 calls', amount: 0.1500, sub: 0.0050 },
+  ];
 
   useEffect(() => {
-    if (address) {
-      fetchReport();
-    }
-  }, [fetchReport, address]);
+    const filtered = MOCK_SALES.filter(item => {
+      const d = new Date(item.date);
+      return d >= startDate && d <= endDate;
+    });
+    setFilteredSales(filtered);
+  }, [startDate, endDate]);
 
-  const onRefresh = () => {
-    setRefreshing(true);
-    fetchReport();
-  };
-
-  const StatCard = ({ title, value, unit }: { title: string; value: string | number; unit?: string }) => (
-    <View style={styles.card}>
-      <Text style={styles.cardTitle}>{title}</Text>
-      <Text style={styles.cardValue}>
-        {value}
-        {unit ? <Text style={styles.unit}> {unit}</Text> : null}
-      </Text>
-    </View>
-  );
+  const totalNet = filteredSales.reduce((acc, item) => acc + item.amount, 0).toFixed(5);
+  const totalFees = filteredSales.reduce((acc, item) => acc + item.sub, 0).toFixed(5);
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-    >
-      <Text style={styles.title}>Sales Report</Text>
-      <Text style={styles.subtitle}>Last 30 Days</Text>
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" />
 
-      {loading && !refreshing ? (
-        <ActivityIndicator size="large" color="#000" style={{ marginTop: 20 }} />
-      ) : error ? (
-        <Text style={styles.error}>{error}</Text>
-      ) : (
-        <>
-          <View style={styles.grid}>
-            <StatCard
-              title="Total Revenue"
-              value={report?.revenue?.total || '0'}
-              unit="ETH"
-            />
-            <StatCard
-              title="Total Calls"
-              value={report?.performance?.totalRequests || '0'}
-            />
-            <StatCard
-              title="Avg Response Time"
-              value={report?.performance?.averageResponseTime || '0'}
-              unit="ms"
-            />
-            <StatCard
-              title="Success Rate"
-              value={report?.performance?.successRate ? `${report.performance.successRate}%` : 'N/A'}
-            />
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Text style={styles.backText}>{'< Home'}</Text>
+        </TouchableOpacity>
+        <View style={styles.headerRight}>
+          <Text style={styles.headerTitle}>FURO</Text>
+          <Text style={styles.headerWallet}>0xdf0B...81e64</Text>
+          <View style={styles.boltIcon}>
+            <MaterialCommunityIcons name="lightning-bolt" size={16} color="#FFD166" />
+          </View>
+        </View>
+      </View>
+
+      <Text style={styles.screenTitle}>Report</Text>
+      <View style={styles.titleUnderline} />
+
+      <ScrollView contentContainerStyle={styles.content}>
+
+        <Text style={styles.sectionTitle}>Revenue</Text>
+
+        {/* Date Filter */}
+        <DateRangeFilter startDate={startDate} endDate={endDate} onApply={(s, e) => { setStartDate(s); setEndDate(e); }} />
+
+        {/* Pie Chart Section */}
+        <View style={styles.chartContainer}>
+          <PieChart
+            data={pieData}
+            donut
+            radius={80}
+            innerRadius={60} // Donut thickness
+            centerLabelComponent={() => (
+              <View /> // Empty center
+            )}
+          />
+        </View>
+
+        {/* Legend */}
+        <View style={styles.legendContainer}>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendColor, { backgroundColor: '#333' }]} />
+            <Text style={styles.legendText}>Net Earning : {'       '}97%</Text>
+          </View>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendColor, { backgroundColor: '#EEE' }]} />
+            <Text style={styles.legendText}>Platform Fees : {'  '}3%</Text>
+          </View>
+        </View>
+
+        {/* Transaction History Card */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Revenue Breakdown:</Text>
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Net (97%):</Text>
+            <Text style={styles.summaryValue}>{totalNet} ETH</Text>
+          </View>
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Platform (3%):</Text>
+            <Text style={styles.summaryValue}>{totalFees} ETH</Text>
           </View>
 
-          <View style={styles.chartContainer}>
-            <Text style={styles.subtitle}>Sales Overview</Text>
-            <View style={styles.chartWrapper}>
-              {report?.purchasesByApi && report.purchasesByApi.length > 0 ? (
-                <BarChart
-                  data={report.purchasesByApi.map((item: any) => ({
-                    value: item.count,
-                    label: item.apiName.length > 10 ? item.apiName.substring(0, 10) + '...' : item.apiName,
-                    frontColor: '#4f46e5',
-                    topLabelComponent: () => (
-                      <Text style={{ color: '#333', fontSize: 10, marginBottom: 4 }}>{item.count}</Text>
-                    ),
-                  }))}
-                  barWidth={32}
-                  noOfSections={4}
-                  barBorderRadius={6}
-                  frontColor="#4f46e5"
-                  yAxisThickness={0}
-                  xAxisThickness={0}
-                  hideRules
-                  isAnimated
-                  animationDuration={300}
-                  width={300}
-                  height={200}
-                  spacing={20}
-                  initialSpacing={10}
-                  labelWidth={40}
-                  xAxisLabelTextStyle={{ color: '#666', fontSize: 10 }}
-                />
-              ) : (
-                <View style={{ height: 200, justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-                  <Text style={{ color: '#666', fontSize: 16 }}>No sales data available</Text>
-                  <Text style={{ fontSize: 32, fontWeight: '700', color: '#333', marginTop: 8 }}>0 Sales</Text>
+          <View style={styles.list}>
+            {filteredSales.map((tx, i) => (
+              <View key={i} style={styles.row}>
+                <View>
+                  <Text style={styles.rowDate}>{tx.date}</Text>
+                  <Text style={styles.rowCalls}>{tx.calls}</Text>
                 </View>
-              )}
-            </View>
+                <View style={{ alignItems: 'flex-end' }}>
+                  <Text style={styles.rowAmount}>{tx.amount.toFixed(5)} ETH</Text>
+                  <Text style={styles.rowSub}>+{tx.sub.toFixed(5)} ETH</Text>
+                </View>
+              </View>
+            ))}
+            {filteredSales.length === 0 && <Text style={{ color: '#666', textAlign: 'center' }}>No sales in this period.</Text>}
           </View>
+        </View>
 
-          <Text style={[styles.subtitle, { marginTop: 32 }]}>Purchases per API</Text>
-          {report?.purchasesByApi && report.purchasesByApi.length > 0 ? (
-            <View style={styles.list}>
-              {report.purchasesByApi.map((item: any, index: number) => (
-                <View key={index} style={styles.listItem}>
-                  <Text style={styles.itemName}>{item.apiName}</Text>
-                  <Text style={styles.itemValue}>{item.count} users</Text>
-                </View>
-              ))}
-            </View>
-          ) : (
-            <Text style={styles.emptyText}>No purchase data available.</Text>
-          )}
-        </>
-      )}
-    </ScrollView>
+      </ScrollView>
+
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
-  content: { padding: 20 },
-  title: { fontSize: 28, fontWeight: '700', color: '#333' },
-  subtitle: { fontSize: 14, color: '#666', marginBottom: 20, marginTop: 4 },
-  grid: { gap: 16 },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  cardTitle: { fontSize: 14, color: '#888', fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5 },
-  cardValue: { fontSize: 32, fontWeight: '700', color: '#000', marginTop: 8 },
-  unit: { fontSize: 16, color: '#666', fontWeight: '500' },
-  error: { color: 'red', fontSize: 16, textAlign: 'center', marginTop: 20 },
-  list: { backgroundColor: '#fff', borderRadius: 16, padding: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
-  listItem: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
-  itemName: { fontSize: 16, color: '#333', fontWeight: '500' },
-  itemValue: { fontSize: 16, color: '#000', fontWeight: '700' },
-  emptyText: { textAlign: 'center', color: '#888', marginTop: 10, fontSize: 14 },
-  chartContainer: { marginTop: 24 },
-  chartWrapper: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+  container: { flex: 1, backgroundColor: '#000' },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
     alignItems: 'center',
-    overflow: 'hidden',
+  },
+  backText: {
+    color: '#FFF',
+    fontSize: 16,
+    textDecorationLine: 'underline',
+    fontWeight: 'bold',
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  headerTitle: {
+    color: '#FFF',
+    fontSize: 20,
+    fontWeight: '900',
+    marginRight: 10,
+  },
+  headerWallet: {
+    color: '#FFF',
+    fontSize: 14,
+    fontFamily: 'monospace',
+  },
+  boltIcon: {
+    backgroundColor: '#2D2CBA',
+    borderRadius: 4,
+    marginLeft: 6,
+    padding: 2,
+  },
+  screenTitle: {
+    fontSize: 28,
+    color: '#FFF',
+    fontWeight: 'bold',
+    marginLeft: 20,
+    marginTop: 10,
+  },
+  titleUnderline: {
+    height: 1,
+    backgroundColor: '#555',
+    width: '60%',
+    marginLeft: 20,
+    marginBottom: 20,
+    marginTop: 5,
+  },
+  content: {
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+  },
+  sectionTitle: {
+    color: '#FFF',
+    fontSize: 20,
+    textDecorationLine: 'underline',
+    marginBottom: 8,
+  },
+  yearButton: {
+    width: 100,
+    backgroundColor: '#333',
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  yearText: {
+    color: '#FFF',
+    fontSize: 16,
+  },
+  chartContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  legendContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    marginBottom: 20,
+    gap: 20,
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  legendColor: {
+    width: 16,
+    height: 16,
+    marginRight: 8,
+    // border?
+  },
+  legendText: {
+    color: '#FFF',
+    fontSize: 14,
+  },
+  card: {
+    backgroundColor: '#111',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#333',
+  },
+  cardTitle: {
+    color: '#666',
+    fontSize: 16,
+    marginBottom: 4,
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  summaryLabel: {
+    color: '#666',
+    fontSize: 16,
+    fontFamily: 'monospace',
+  },
+  summaryValue: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+    fontFamily: 'monospace',
+  },
+  list: {
+    marginTop: 20,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+    alignItems: 'center',
+  },
+  rowDate: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontFamily: 'monospace',
+    marginBottom: 4,
+  },
+  rowCalls: {
+    color: '#666',
+    fontSize: 14,
+  },
+  rowAmount: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontFamily: 'monospace',
+    marginBottom: 4,
+  },
+  rowSub: {
+    color: '#666',
+    fontSize: 12,
   },
 });

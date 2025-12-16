@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Modal, TouchableOpacity, StyleSheet, ActivityIndicator, Linking, Alert, Image } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 type WalletType = 'metamask' | 'rainbow' | 'coinbase' | 'walletconnect';
 
@@ -13,40 +14,37 @@ interface ConnectWalletModalProps {
 export default function ConnectWalletModal({ visible, onClose, pairingUri, connect }: ConnectWalletModalProps) {
     const [loading, setLoading] = useState(false);
 
-    // Reset loading state when modal opens/closes
     useEffect(() => {
         if (visible) setLoading(false);
     }, [visible]);
 
+    useEffect(() => {
+        if (visible && !pairingUri) {
+            connect().catch(() => { });
+        }
+    }, [visible, pairingUri]);
+
     async function connectVia(target: WalletType) {
         setLoading(true);
         try {
-            // 1. Ensure we have a pairing URI (start connection if needed)
             let uri = pairingUri;
             if (!uri) {
-                await connect();
-                // Wait for URI to populate in context
-                // simpler approach: we can't easily "await" the context update here unless we poll or the parent handles it.
-                // But assuming connect() in context updates the state, we just need to wait a tick or poll.
-                uri = await waitForPairingUri(15000);
+                // If we don't have a URI yet, we might want to wait or try connect again, 
+                // but for now we'll assume the parent/useEffect triggered it.
+                // We'll give it a quick check or alert.
+                if (!uri) {
+                    Alert.alert('Initializing', 'Please wait for the connection link to generate...');
+                    setLoading(false);
+                    return;
+                }
             }
 
-            if (!uri) {
-                Alert.alert('Connection Failed', 'Could not generate a pairing link. Please try again.');
-                setLoading(false);
-                return;
-            }
-
-            // 2. Generate Deep Link
-            const link = walletLinkFor(target, uri);
-
-            // 3. Open
+            const link = walletLinkFor(target, uri!);
             const canOpen = await Linking.canOpenURL(link);
             if (canOpen) {
                 await Linking.openURL(link);
-                onClose(); // Close modal after selection implies "Go confirm in wallet"
+                onClose();
             } else {
-                // Fallback or error
                 await Linking.openURL(link).catch(() => {
                     Alert.alert('Error', `Could not open ${target}. Do you have the app installed?`);
                 });
@@ -57,65 +55,6 @@ export default function ConnectWalletModal({ visible, onClose, pairingUri, conne
         } finally {
             setLoading(false);
         }
-    }
-
-    // Poll helper to get updated URI from (likely) context updates or prop updates
-    async function waitForPairingUri(timeout: number): Promise<string | null> {
-        // Current prop might be stale if connect() matches updates.
-        // However, since we are inside a component, we can't easily see future prop updates in a sync function.
-        // We will rely on the parent (Context) already having set pairingUri if connect() finished.
-        // But WalletContext.connect() is async and sets state.
-
-        // If we truly need to wait for the Prop to update, we need a refined flow. 
-        // For now, let's assume if connect() returns, the URI is available or soon to be.
-        // A simple hacky poll on the prop isn't possible because the closure captures the old prop.
-        // We actually need to rely on `connect` returning the URI, but the context `connect` returns `void`.
-
-        // FIX: We'll just wait a small delay, or better, we should modify WalletContext or use a ref mechanism if possible.
-        // But to avoid changing Context too much, let's just attempt to use the pairingUri we have. 
-        // If it was null, and we called connect(), we hope `connect()` awaits internally until URI is set?
-        // Looking at WalletContext.tsx:
-        // `if (uri) setPairingUri(uri);` happens inside connect().
-        // So by the time `await connect()` finishes, state update is scheduled.
-        // React state updates might not be visible in this closure immediately.
-
-        // We will use a small sleep then check if existing logic in BalanceScreen works.
-        // BalanceScreen used a `waitForPairingUri` loop that checked `pairingUri` from closure? 
-        // Wait, BalanceScreen's `waitForPairingUri` checks `pairingUri` which is a constant in that render scope... 
-        // actually it relies on re-renders? No, `while` loop in a functional component WON'T see updated state unless using a Ref.
-        // BalanceScreen's implementation was actually buggy if it relied on state variable updates inside a loop in one render!
-        // But let's look at BalanceScreen again.
-
-        // BalanceScreen:
-        // `const { ... pairingUri ... } = useWallet();`
-        // `async function waitForPairingUri(ms: number) { ... while... if (pairingUri) return pairingUri ... }`
-        // This looks like it wouldn't work if pairingUri updates in next render completely.
-        // UNLESS `pairingUri` is a Ref in the context? No, it's state.
-        // So BalanceScreen logic seems flawed for "waiting" on a state update inside an async function component closure.
-
-        // HOWEVER, for this Modal, we will assume `await connect()` is sufficient, OR we just trust that `connect()` sets it.
-        // We will implement a clearer path: If `pairingUri` is null, call `connect()`.
-        // We might need to ask the user to "Tap again" if it wasn't instant?
-        // Or we simply close the modal and expect the user to have connected?
-
-        // Better Approach: Trigger `connect()` immediately when Modal opens if URI is null?
-        // Parent handles `connect`.
-        // The Modal just assumes if `pairingUri` is available, we use it. 
-        // If `pairingUri` is null, we show "Initializing...".
-
-        // Let's rely on the parent to handle `connect()` before or during.
-        // But to be robust, we'll try to use the `uri` from `connect` if we can change `connect` validation.
-        // But I can't easily change `connect` return type without exploring more.
-
-        // I will implement a simpler flow:
-        // If `pairingUri` is null, show "Loading QR...".
-        // Once `pairingUri` (prop) is set, enable buttons.
-        // If buttons are clicked, we use the prop.
-
-        // So `connectVia` will just use `props.pairingUri`.
-        // If it's null, we warn "Please wait for connection initialization".
-
-        return pairingUri || null;
     }
 
     function walletLinkFor(target: WalletType, uri: string) {
@@ -129,31 +68,54 @@ export default function ConnectWalletModal({ visible, onClose, pairingUri, conne
         }
     }
 
-    // We should auto-trigger connect if missing when modal opens?
-    // User might have canceled previous.
-    // We'll leave that to the parent or a `useEffect`.
-    useEffect(() => {
-        if (visible && !pairingUri) {
-            connect().catch(() => { });
-        }
-    }, [visible, pairingUri]);
-
     return (
-        <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+        <Modal visible={visible} animationType="fade" transparent onRequestClose={onClose}>
             <View style={styles.backdrop}>
                 <View style={styles.card}>
-                    <Text style={styles.title}>Connect Wallet</Text>
-                    <Text style={styles.subtitle}>Select your wallet to log in</Text>
+                    {/* Digital Number GIF Background */}
+                    <Image
+                        source={{ uri: 'https://media.giphy.com/media/26tn33aiTi1jkl6H6/giphy.gif' }}
+                        style={StyleSheet.absoluteFillObject}
+                        resizeMode="cover"
+                        opacity={0.08} // Subtle background
+                    />
 
-                    <View style={styles.grid}>
+                    <Text style={styles.title}>Choose your wallet</Text>
+
+                    <View style={styles.listContainer}>
                         {!pairingUri ? (
-                            <ActivityIndicator size="large" color="#444" style={{ margin: 20 }} />
+                            <View style={styles.loadingContainer}>
+                                <ActivityIndicator size="large" color="#000" />
+                                <Text style={styles.loadingText}>Initializing...</Text>
+                            </View>
                         ) : (
                             <>
-                                <WalletButton name="MetaMask" type="metamask" onPress={() => connectVia('metamask')} color="#F6851B" />
-                                <WalletButton name="Rainbow" type="rainbow" onPress={() => connectVia('rainbow')} color="#001E59" />
-                                <WalletButton name="Coinbase" type="coinbase" onPress={() => connectVia('coinbase')} color="#0052FF" />
-                                <WalletButton name="WalletConnect" type="walletconnect" onPress={() => connectVia('walletconnect')} color="#3B99FC" />
+                                <WalletOption
+                                    name="Wallet Connect"
+                                    icon={<MaterialCommunityIcons name="link-variant" size={24} color="#FFF" />}
+                                    iconColor="#3B99FC"
+                                    onPress={() => connectVia('walletconnect')}
+                                    isFirst
+                                />
+                                <WalletOption
+                                    name="Rainbow"
+                                    icon={<MaterialCommunityIcons name="palette" size={24} color="#FFF" />}
+                                    iconColor="#001E59"
+                                    onPress={() => connectVia('rainbow')}
+                                />
+                                <WalletOption
+                                    name="MetaMask"
+                                    icon={<MaterialCommunityIcons name="paw" size={24} color="#FFF" />}
+                                    iconColor="#F6851B"
+                                    onPress={() => connectVia('metamask')}
+                                />
+                                <WalletOption
+                                    name="Base Account"
+                                    icon={<MaterialCommunityIcons name="cube-outline" size={24} color="#FFF" />}
+                                    iconColor="#4F46E5"
+                                    onPress={() => connectVia('coinbase')}
+                                    isLast
+                                />
                             </>
                         )}
                     </View>
@@ -167,28 +129,102 @@ export default function ConnectWalletModal({ visible, onClose, pairingUri, conne
     );
 }
 
-function WalletButton({ name, type, onPress, color }: { name: string, type: string, onPress: () => void, color: string }) {
-    // We can add icons later. For now, styled buttons.
+function WalletOption({ name, icon, iconColor, onPress, isFirst, isLast }: any) {
     return (
-        <TouchableOpacity style={[styles.walletBtn, { borderColor: color }]} onPress={onPress}>
-            <View style={[styles.iconPlaceholder, { backgroundColor: color }]}>
-                <Text style={styles.iconText}>{name[0]}</Text>
+        <TouchableOpacity
+            style={[
+                styles.optionBtn,
+                isFirst && styles.optionBtnFirst,
+                isLast && styles.optionBtnLast
+            ]}
+            onPress={onPress}
+        >
+            <View style={[styles.iconContainer, { backgroundColor: iconColor }]}>
+                {icon}
             </View>
-            <Text style={styles.walletName}>{name}</Text>
+            <Text style={styles.optionText}>{name}</Text>
         </TouchableOpacity>
     );
 }
 
 const styles = StyleSheet.create({
-    backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-    card: { backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 24, paddingBottom: 40 },
-    title: { fontSize: 20, fontWeight: '700', textAlign: 'center', marginBottom: 8 },
-    subtitle: { fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 24 },
-    grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: 16 },
-    walletBtn: { width: '48%', flexDirection: 'row', alignItems: 'center', padding: 12, borderWidth: 1, borderRadius: 12, marginBottom: 12 },
-    iconPlaceholder: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center', marginRight: 10 },
-    iconText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
-    walletName: { fontSize: 16, fontWeight: '600', color: '#333' },
-    cancelButton: { marginTop: 8, padding: 16, alignItems: 'center' },
-    cancelText: { fontSize: 16, color: '#666' }
+    backdrop: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        justifyContent: 'flex-end',
+        paddingBottom: 30
+    },
+    card: {
+        backgroundColor: '#fff',
+        borderTopLeftRadius: 24,
+        borderTopRightRadius: 24,
+        padding: 24,
+        overflow: 'hidden', // Clip the background image
+        // Semi-modal look implies it might not go all the way to bottom in some designs, 
+        // but Image 2 looks like a bottom sheet.
+        // We'll add some margin for the "Cancel" button separation if desired, 
+        // but design shows Cancel button floating or part of the sheet.
+        // Let's make it a full bottom sheet style.
+    },
+    title: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        marginBottom: 20,
+        color: '#000',
+        textAlign: 'left'
+    },
+    listContainer: {
+        backgroundColor: '#F2F2F7', // Standard iOS grouped background color
+        borderRadius: 12,
+        marginBottom: 20,
+    },
+    loadingContainer: {
+        padding: 20,
+        alignItems: 'center'
+    },
+    loadingText: {
+        marginTop: 10,
+        color: '#666'
+    },
+    optionBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 16,
+        backgroundColor: '#F2F2F7', // Or transparent if container has color
+        borderBottomWidth: 1,
+        borderBottomColor: '#D1D1D6',
+    },
+    optionBtnFirst: {
+        borderTopLeftRadius: 12,
+        borderTopRightRadius: 12,
+    },
+    optionBtnLast: {
+        borderBottomLeftRadius: 12,
+        borderBottomRightRadius: 12,
+        borderBottomWidth: 0,
+    },
+    iconContainer: {
+        width: 32,
+        height: 32,
+        borderRadius: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 12,
+    },
+    optionText: {
+        fontSize: 17,
+        fontWeight: '600',
+        color: '#000',
+    },
+    cancelButton: {
+        backgroundColor: '#E5E5EA',
+        borderRadius: 12,
+        padding: 16,
+        alignItems: 'center',
+    },
+    cancelText: {
+        fontSize: 17,
+        fontWeight: '600',
+        color: '#000',
+    }
 });
