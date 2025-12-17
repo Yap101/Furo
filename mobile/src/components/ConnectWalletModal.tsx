@@ -75,9 +75,8 @@ export default function ConnectWalletModal({ visible, onClose, pairingUri, conne
                     {/* Digital Number GIF Background */}
                     <Image
                         source={{ uri: 'https://media.giphy.com/media/26tn33aiTi1jkl6H6/giphy.gif' }}
-                        style={StyleSheet.absoluteFillObject}
+                        style={[StyleSheet.absoluteFillObject, { opacity: 0.08 }]}
                         resizeMode="cover"
-                        opacity={0.08} // Subtle background
                     />
 
                     <Text style={styles.title}>Choose your wallet</Text>

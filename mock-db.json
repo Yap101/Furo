@@ -1,0 +1,65 @@
+{
+  "providers": [
+    {
+      "id": "provider_default",
+      "walletAddress": "0xDefaultProvider",
+      "name": "Default Provider",
+      "email": "provider@furo.com",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "apis": [
+    {
+      "id": "api_1765981631792",
+      "providerId": "provider_default",
+      "name": "Test API",
+      "description": "",
+      "category": "Test",
+      "endpoint": "https://example.com/api",
+      "publicPath": "/api/default/test-api-1765981631792",
+      "pricePerCall": "0.01",
+      "currency": "ETH",
+      "isActive": true,
+      "totalCalls": 0,
+      "averageResponseTime": 0,
+      "uptime": 100,
+      "createdAt": "2025-12-17T14:27:11.792Z",
+      "updatedAt": "2025-12-17T14:27:11.793Z"
+    },
+    {
+      "id": "api_1765981649038",
+      "providerId": "provider_default",
+      "name": "Test API",
+      "description": "",
+      "category": "Test",
+      "endpoint": "https://example.com/api",
+      "publicPath": "/api/default/test-api-1765981649038",
+      "pricePerCall": "0.01",
+      "currency": "ETH",
+      "isActive": true,
+      "totalCalls": 0,
+      "averageResponseTime": 0,
+      "uptime": 100,
+      "createdAt": "2025-12-17T14:27:29.038Z",
+      "updatedAt": "2025-12-17T14:27:29.038Z"
+    },
+    {
+      "id": "api_1765983238074",
+      "providerId": "provider_default",
+      "name": "Phone Test",
+      "description": "",
+      "category": "Finance",
+      "endpoint": "https://example.com/api",
+      "publicPath": "/api/default/phone-test-1765983238074",
+      "pricePerCall": "0.02",
+      "currency": "ETH",
+      "isActive": true,
+      "totalCalls": 0,
+      "averageResponseTime": 0,
+      "uptime": 100,
+      "createdAt": "2025-12-17T14:53:58.074Z",
+      "updatedAt": "2025-12-17T14:53:58.074Z"
+    }
+  ]
+}

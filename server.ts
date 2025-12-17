@@ -1,6 +1,8 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import * as fs from 'fs';
+import * as path from 'path';
 import { PrismaClient } from './prisma/generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 
@@ -136,27 +138,44 @@ app.get('/api/providers/me/report', async (req: express.Request, res: express.Re
     }
 });
 
-app.post('/api/providers/me/apis', async (req: express.Request, res: express.Response) => {
-    // For now, we simulate "me" by taking providerId or walletAddress from body or assume a single user context if auth isn't fully set up.
-    // Based on existing code conventions, it seems we might need to rely on a hardcoded provider or pass it in.
-    // However, looking at the schema, Api requires providerId.
-    // Let's check if we can get a default provider or if the client sends something identifying.
-    // The previous client code didn't send auth headers.
-    // We will assume a default provider exists or create one for "me" if missing, 
-    // BUT strictly for this prototype, let's find the FIRST provider or create a seed one.
+// Helper functions for mock database
+const MOCK_DB_PATH = path.join(__dirname, 'mock-db.json');
 
+interface MockDb {
+    providers: any[];
+    apis: any[];
+}
+
+function readMockDb(): MockDb {
     try {
-        let provider = await prisma.provider.findFirst();
+        const data = fs.readFileSync(MOCK_DB_PATH, 'utf-8');
+        return JSON.parse(data);
+    } catch {
+        return { providers: [], apis: [] };
+    }
+}
+
+function writeMockDb(db: MockDb): void {
+    fs.writeFileSync(MOCK_DB_PATH, JSON.stringify(db, null, 2), 'utf-8');
+}
+
+app.post('/api/providers/me/apis', async (req: express.Request, res: express.Response) => {
+    // Using mock JSON file instead of Prisma for local development
+    try {
+        const db = readMockDb();
+
+        // Get or create default provider
+        let provider = db.providers[0];
         if (!provider) {
-            provider = await prisma.provider.create({
-                data: {
-                    id: `provider_${Date.now()}`,
-                    walletAddress: '0xDefaultProvider',
-                    name: 'Default Provider',
-                    email: 'provider@furo.com',
-                    updatedAt: new Date()
-                }
-            });
+            provider = {
+                id: `provider_${Date.now()}`,
+                walletAddress: '0xDefaultProvider',
+                name: 'Default Provider',
+                email: 'provider@furo.com',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+            db.providers.push(provider);
         }
 
         const { name, description, category, endpoint, price, currency } = req.body;
@@ -167,24 +186,30 @@ app.post('/api/providers/me/apis', async (req: express.Request, res: express.Res
 
         // Generate a simple public path
         const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-        const publicPath = `/api/${provider.id.split('-')[0]}/${slug}-${Date.now()}`;
+        const publicPath = `/api/${provider.id.split('_')[1] || 'default'}/${slug}-${Date.now()}`;
 
-        const newApi = await prisma.api.create({
-            data: {
-                id: `api_${Date.now()}`,
-                providerId: provider.id,
-                name,
-                description: description || '',
-                category: category || 'Uncategorized',
-                endpoint,
-                publicPath,
-                pricePerCall: price,
-                currency: currency || 'ETH',
-                isActive: true,
-                updatedAt: new Date()
-            }
-        });
+        const newApi = {
+            id: `api_${Date.now()}`,
+            providerId: provider.id,
+            name,
+            description: description || '',
+            category: category || 'Uncategorized',
+            endpoint,
+            publicPath,
+            pricePerCall: price,
+            currency: currency || 'ETH',
+            isActive: true,
+            totalCalls: 0,
+            averageResponseTime: 0,
+            uptime: 100,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
 
+        db.apis.push(newApi);
+        writeMockDb(db);
+
+        console.log(`✅ API saved to mock-db.json: ${name}`);
         res.json({ data: newApi });
     } catch (error: any) {
         console.error('Error creating API:', error);
@@ -192,6 +217,7 @@ app.post('/api/providers/me/apis', async (req: express.Request, res: express.Res
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on http://0.0.0.0:${PORT}`);
+    console.log(`📱 Mobile device access: http://192.168.0.101:${PORT}`);
 });
