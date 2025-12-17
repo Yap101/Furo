@@ -3,8 +3,19 @@
     "name": "Furo Mobile",
     "slug": "furo-mobile",
     "version": "0.1.0",
-    "platforms": ["ios", "android", "web"],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "scheme": "furo-mobile",
+    "newArchEnabled": false,
+    "android": {
+      "newArchEnabled": false
+    },
+    "ios": {
+      "newArchEnabled": false
+    },
     "extra": {
       "note": "Use EXPO_PUBLIC_BASE_URL env for runtime API base URL",
       "EXPO_PUBLIC_WC_PROJECT_ID": "ad8e704b2aacaff2e26c9a06c81dba0d"

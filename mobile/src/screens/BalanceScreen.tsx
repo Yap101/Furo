@@ -103,7 +103,10 @@ export default function BalanceScreen({ navigation }: any) {
           {busy ? (
             <ActivityIndicator color="#FFF" style={{ marginTop: 10 }} />
           ) : (
-            <Text style={styles.balanceValue}>{totalBalance} ETH</Text>
+            <>
+              <Text style={styles.balanceValue}>{totalBalance} ETH</Text>
+              <Text style={styles.myrText}>≈ MYR {(parseFloat(totalBalance) * 16500).toFixed(2)}</Text>
+            </>
           )}
         </View>
 
@@ -245,5 +248,11 @@ const styles = StyleSheet.create({
   rowSub: {
     color: '#666',
     fontSize: 12,
+  },
+  myrText: {
+    color: '#4ade80',
+    fontSize: 18,
+    marginTop: 8,
+    fontFamily: 'monospace',
   },
 });

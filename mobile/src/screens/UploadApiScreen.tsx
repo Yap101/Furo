@@ -124,6 +124,11 @@ export default function UploadApiScreen({ navigation }: any) {
             onChangeText={setPrice}
             keyboardType="numeric"
           />
+          {price && !isNaN(parseFloat(price)) && (
+            <Text style={styles.conversionText}>
+              ≈ MYR {(parseFloat(price) * 16500).toFixed(2)}
+            </Text>
+          )}
         </View>
 
         <View style={styles.inputContainer}>
@@ -341,5 +346,11 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 18,
     textAlign: 'center',
+  },
+  conversionText: {
+    color: '#4ade80',
+    fontSize: 14,
+    marginTop: 8,
+    fontFamily: 'monospace',
   },
 });

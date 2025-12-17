@@ -21,6 +21,13 @@ export default function DateRangeFilter({ startDate, endDate, onApply }: DateRan
         return date.toISOString().split('T')[0];
     };
 
+    const openModal = () => {
+        // Sync temp states with current props when opening modal
+        setTempStart(startDate);
+        setTempEnd(endDate);
+        setModalVisible(true);
+    };
+
     const handleApply = () => {
         onApply(tempStart, tempEnd);
         setModalVisible(false);
@@ -44,7 +51,7 @@ export default function DateRangeFilter({ startDate, endDate, onApply }: DateRan
 
     return (
         <>
-            <TouchableOpacity style={styles.filterButton} onPress={() => setModalVisible(true)}>
+            <TouchableOpacity style={styles.filterButton} onPress={openModal}>
                 <Text style={styles.filterText}>{`${formatDate(startDate)} - ${formatDate(endDate)}`}</Text>
                 <MaterialCommunityIcons name="calendar-month" size={20} color="#FFF" />
             </TouchableOpacity>
