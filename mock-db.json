@@ -60,6 +60,23 @@
       "uptime": 100,
       "createdAt": "2025-12-17T14:53:58.074Z",
       "updatedAt": "2025-12-17T14:53:58.074Z"
+    },
+    {
+      "id": "api_1765988237296",
+      "providerId": "provider_default",
+      "name": "Hi",
+      "description": "Hu",
+      "category": "AI/ML",
+      "endpoint": "https",
+      "publicPath": "/api/default/hi-1765988237296",
+      "pricePerCall": "1",
+      "currency": "ETH",
+      "isActive": true,
+      "totalCalls": 0,
+      "averageResponseTime": 0,
+      "uptime": 100,
+      "createdAt": "2025-12-17T16:17:17.296Z",
+      "updatedAt": "2025-12-17T16:17:17.297Z"
     }
   ]
 }

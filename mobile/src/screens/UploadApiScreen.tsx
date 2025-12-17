@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, Modal, TouchableWithoutFeedback, StatusBar } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { apiPost } from '../api/client';
 
 const APIS_STORAGE_KEY = '@furo_uploaded_apis';
 
@@ -26,24 +26,22 @@ export default function UploadApiScreen({ navigation }: any) {
     setLoading(true);
     try {
       const newApi = {
-        id: `api_${Date.now()}`,
         name,
         description: description || '',
         category,
         endpoint,
-        pricePerCall: price,
+        price,
         currency: 'ETH',
-        isActive: isActivate,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        isActive: isActivate
       };
 
-      const existingData = await AsyncStorage.getItem(APIS_STORAGE_KEY);
-      const apis = existingData ? JSON.parse(existingData) : [];
-      apis.push(newApi);
-      await AsyncStorage.setItem(APIS_STORAGE_KEY, JSON.stringify(apis));
+      const res = await apiPost('/api/providers/me/apis', newApi);
 
-      Alert.alert('Success', `API "${name}" saved!`);
+      if (!res.ok) {
+        throw new Error(res.error || 'Failed to upload API');
+      }
+
+      Alert.alert('Success', `API "${name}" uploaded successfully!`);
       navigation.goBack();
     } catch (err: any) {
       Alert.alert('Error', err.message || 'Failed to save');
