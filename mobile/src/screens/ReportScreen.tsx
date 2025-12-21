@@ -5,12 +5,14 @@ import { PieChart } from 'react-native-gifted-charts';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DateRangeFilter from '../components/DateRangeFilter';
+import { apiGet } from '../api/client';
 
 export default function ReportScreen({ navigation }: any) {
   const { address } = useWallet();
   const [startDate, setStartDate] = useState(new Date('2023-01-01'));
   const [endDate, setEndDate] = useState(new Date('2024-12-31'));
   const [filteredSales, setFilteredSales] = useState<any[]>([]);
+
 
   // Mock Data for Design (Image 2)
   const pieData = [
@@ -30,7 +32,28 @@ export default function ReportScreen({ navigation }: any) {
     { id: '6', date: '2023-06-01', calls: '1000 calls', amount: 0.1500, sub: 0.0050 },
   ];
 
+  // Calculate summary from MOCK_SALES
+  const calculatedSummary = MOCK_SALES.reduce((acc, item) => {
+    const calls = parseInt(item.calls.replace(' calls', '')) || 0;
+    return {
+      totalCalls: acc.totalCalls + calls,
+      netEarning: acc.netEarning + item.amount,
+      platformFee: acc.platformFee + item.sub
+    };
+  }, { totalCalls: 0, netEarning: 0, platformFee: 0 });
+
+  const [summary, setSummary] = useState({
+    totalApis: 4, // Hardcoded as per mock context
+    totalCalls: calculatedSummary.totalCalls,
+    netEarning: calculatedSummary.netEarning.toFixed(5),
+    platformFee: calculatedSummary.platformFee.toFixed(5),
+    averageRating: 4.8
+  });
+
   useEffect(() => {
+    // We are using local MOCK_SALES for specific demo consistency as requested.
+    // In a real app, we would fetch from: await apiGet(`/api/providers/me/report?address=${address}`);
+
     const filtered = MOCK_SALES.filter(item => {
       const d = new Date(item.date);
       return d >= startDate && d <= endDate;
@@ -64,7 +87,36 @@ export default function ReportScreen({ navigation }: any) {
 
       <ScrollView contentContainerStyle={styles.content}>
 
-        <Text style={styles.sectionTitle}>Revenue</Text>
+        {/* Overview Card */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Overview</Text>
+          <View style={styles.metricsGrid}>
+            <View style={styles.metricItem}>
+              <Text style={styles.metricValue}>{summary.totalApis}</Text>
+              <Text style={styles.metricLabel}>Total API</Text>
+            </View>
+            <View style={styles.metricItem}>
+              <Text style={styles.metricValue}>{summary.totalCalls}</Text>
+              <Text style={styles.metricLabel}>Total Calls</Text>
+            </View>
+            <View style={styles.metricItem}>
+              <Text style={styles.metricValue}>{summary.averageRating}</Text>
+              <Text style={styles.metricLabel}>Avg Rating</Text>
+            </View>
+          </View>
+          <View style={[styles.metricsGrid, { marginTop: 16 }]}>
+            <View style={styles.metricItem}>
+              <Text style={styles.metricValue}>{summary.netEarning} ETH</Text>
+              <Text style={styles.metricLabel}>Net Earning</Text>
+            </View>
+            <View style={styles.metricItem}>
+              <Text style={styles.metricValue}>{summary.platformFee} ETH</Text>
+              <Text style={styles.metricLabel}>Platform Fee</Text>
+            </View>
+          </View>
+        </View>
+
+        <Text style={[styles.sectionTitle, { marginTop: 24 }]}>Revenue</Text>
 
         {/* Date Filter */}
         <DateRangeFilter startDate={startDate} endDate={endDate} onApply={(s, e) => { setStartDate(s); setEndDate(e); }} />
@@ -286,5 +338,24 @@ const styles = StyleSheet.create({
   rowSub: {
     color: '#666',
     fontSize: 12,
+  },
+  metricsGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  metricItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  metricValue: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+    fontFamily: 'monospace',
+  },
+  metricLabel: {
+    color: '#888',
+    fontSize: 12,
+    marginTop: 4,
   },
 });

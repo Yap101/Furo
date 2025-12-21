@@ -16,7 +16,7 @@ const ANDROID_EMULATOR = 'http://10.0.2.2:3000';
 
 // Attempt to derive the LAN IP from the Expo bundler URL
 const debuggerHost = Constants.expoConfig?.hostUri || Constants.manifest2?.extra?.expoGo?.debuggerHost;
-const lanIp = debuggerHost ? debuggerHost.split(':')[0] : '192.168.1.100';
+const lanIp = debuggerHost ? debuggerHost.split(':')[0] : '10.74.250.210';
 const LAN_API = `http://${lanIp}:3000`;
 
 // Resolution order:

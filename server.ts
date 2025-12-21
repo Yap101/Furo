@@ -126,11 +126,18 @@ app.get('/api/providers/me/report', async (req: express.Request, res: express.Re
 
         res.json({
             data: {
+                summary: {
+                    totalApis: apis.length,
+                    totalCalls: totalCalls,
+                    netEarning: (totalRevenue * 0.97).toFixed(4),
+                    platformFee: (totalRevenue * 0.03).toFixed(4),
+                    averageRating: 4.8
+                },
                 revenue: { total: totalRevenue.toFixed(4) },
                 performance: {
                     totalRequests: totalCalls,
                     averageResponseTime: Math.round(avgResponseTime),
-                    successRate: 98 // Hardcoded for now as uptime is per API
+                    successRate: 98
                 },
                 purchasesByApi
             }
@@ -223,5 +230,5 @@ app.post('/api/providers/me/apis', async (req: express.Request, res: express.Res
 
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on http://0.0.0.0:${PORT}`);
-    console.log(`📱 Mobile device access: http://192.168.0.101:${PORT}`);
+    console.log(`📱 Mobile device access: http://10.74.250.210:${PORT}`);
 });
