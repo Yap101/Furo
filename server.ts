@@ -75,59 +75,23 @@ app.get('/api/providers/me/report', async (req: express.Request, res: express.Re
     }
 
     try {
-        // Find provider by wallet address
-        const provider = await prisma.provider.findFirst({
-            where: { walletAddress: address }
-        });
+        // Fetch data from Mock DB only as requested
+        const db = readMockDb();
+        const mockApis = db.apis;
 
-        if (!provider) {
-            // If provider not found, return empty report or create one?
-            // For now, return zeros
-            return res.json({
-                data: {
-                    revenue: { total: '0' },
-                    performance: {
-                        totalRequests: 0,
-                        averageResponseTime: 0,
-                        successRate: 100
-                    },
-                    purchasesByApi: []
-                }
-            });
-        }
-
-        // Get APIs owned by provider
-        const apis = await prisma.api.findMany({
-            where: { providerId: provider.id }
-        });
-
-        const totalCalls = apis.reduce((acc, api) => acc + api.totalCalls, 0);
-        const avgResponseTime = apis.length > 0
-            ? apis.reduce((acc, api) => acc + api.averageResponseTime, 0) / apis.length
+        const totalApis = mockApis.length;
+        const totalCalls = mockApis.reduce((acc: number, api: any) => acc + (api.totalCalls || 0), 0);
+        const avgResponseTime = totalApis > 0
+            ? mockApis.reduce((acc: number, api: any) => acc + (api.averageResponseTime || 0), 0) / totalApis
             : 0;
 
-        // Calculate revenue from PurchasedApi
-        const purchases = await prisma.purchasedApi.findMany({
-            where: { providerId: provider.id },
-            include: { Api: true }
-        });
-
-        const totalRevenue = purchases.reduce((acc, p) => acc + parseFloat(p.paymentAmount || '0'), 0);
-
-        // Group purchases by API
-        const purchasesMap = new Map<string, { apiName: string, count: number }>();
-        purchases.forEach(p => {
-            const current = purchasesMap.get(p.apiId) || { apiName: p.Api.name, count: 0 };
-            current.count++;
-            purchasesMap.set(p.apiId, current);
-        });
-
-        const purchasesByApi = Array.from(purchasesMap.values());
+        // Simulate revenue based on calls
+        const totalRevenue = totalCalls * 0.001;
 
         res.json({
             data: {
                 summary: {
-                    totalApis: apis.length,
+                    totalApis: totalApis,
                     totalCalls: totalCalls,
                     netEarning: (totalRevenue * 0.97).toFixed(4),
                     platformFee: (totalRevenue * 0.03).toFixed(4),
@@ -139,7 +103,10 @@ app.get('/api/providers/me/report', async (req: express.Request, res: express.Re
                     averageResponseTime: Math.round(avgResponseTime),
                     successRate: 98
                 },
-                purchasesByApi
+                purchasesByApi: mockApis.map((api: any) => ({
+                    apiName: api.name,
+                    count: api.totalCalls || 0
+                }))
             }
         });
 

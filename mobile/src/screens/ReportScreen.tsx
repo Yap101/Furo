@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, StatusBar, TouchableOpacity } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { useWallet } from '../wallet/WalletContext';
 import { PieChart } from 'react-native-gifted-charts';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -43,23 +44,46 @@ export default function ReportScreen({ navigation }: any) {
   }, { totalCalls: 0, netEarning: 0, platformFee: 0 });
 
   const [summary, setSummary] = useState({
-    totalApis: 4, // Hardcoded as per mock context
-    totalCalls: calculatedSummary.totalCalls,
-    netEarning: calculatedSummary.netEarning.toFixed(5),
-    platformFee: calculatedSummary.platformFee.toFixed(5),
+    totalApis: 0,
+    totalCalls: 0,
+    netEarning: '0.0000',
+    platformFee: '0.0000',
     averageRating: 4.8
   });
 
-  useEffect(() => {
-    // We are using local MOCK_SALES for specific demo consistency as requested.
-    // In a real app, we would fetch from: await apiGet(`/api/providers/me/report?address=${address}`);
+  const fetchReport = async () => {
+    if (!address) return;
+    try {
+      const res = await apiGet(`/api/providers/me/report?address=${address}`);
+      if (res && res.data && res.data.summary) {
+        setSummary({
+          ...res.data.summary,
+          totalApis: res.data.summary.totalApis ?? 0
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch report:', error);
+    }
+  };
 
+  useFocusEffect(
+    useCallback(() => {
+      fetchReport();
+    }, [address])
+  );
+
+  useEffect(() => {
     const filtered = MOCK_SALES.filter(item => {
       const d = new Date(item.date);
       return d >= startDate && d <= endDate;
     });
     setFilteredSales(filtered);
   }, [startDate, endDate]);
+
+  const totalCallsFiltered = filteredSales.reduce((acc, item) => {
+    const calls = parseInt(item.calls.replace(' calls', '')) || 0;
+    return acc + calls;
+  }, 0);
 
   const totalNet = filteredSales.reduce((acc, item) => acc + item.amount, 0).toFixed(5);
   const totalFees = filteredSales.reduce((acc, item) => acc + item.sub, 0).toFixed(5);
@@ -96,7 +120,7 @@ export default function ReportScreen({ navigation }: any) {
               <Text style={styles.metricLabel}>Total API</Text>
             </View>
             <View style={styles.metricItem}>
-              <Text style={styles.metricValue}>{summary.totalCalls}</Text>
+              <Text style={styles.metricValue}>{totalCallsFiltered}</Text>
               <Text style={styles.metricLabel}>Total Calls</Text>
             </View>
             <View style={styles.metricItem}>
@@ -106,11 +130,11 @@ export default function ReportScreen({ navigation }: any) {
           </View>
           <View style={[styles.metricsGrid, { marginTop: 16 }]}>
             <View style={styles.metricItem}>
-              <Text style={styles.metricValue}>{summary.netEarning} ETH</Text>
+              <Text style={styles.metricValue}>{totalNet} ETH</Text>
               <Text style={styles.metricLabel}>Net Earning</Text>
             </View>
             <View style={styles.metricItem}>
-              <Text style={styles.metricValue}>{summary.platformFee} ETH</Text>
+              <Text style={styles.metricValue}>{totalFees} ETH</Text>
               <Text style={styles.metricLabel}>Platform Fee</Text>
             </View>
           </View>
